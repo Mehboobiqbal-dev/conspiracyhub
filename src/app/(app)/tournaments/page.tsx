@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Bot, Users } from "lucide-react";
 import Image from 'next/image';
+import { PlaceHolderImages } from "@/lib/placeholder-images";
 
 type State = {
   result: CreateAIOpponentsForTournamentOutput | null;
@@ -46,6 +47,7 @@ export default function TournamentsPage() {
   const initialState: State = { result: null, error: null };
   const [state, formAction] = useFormState(createOpponentsAction, initialState);
   const [opponentCount, setOpponentCount] = React.useState(8);
+  const tournamentBanner = PlaceHolderImages.find(img => img.id === 'tournament-banner');
 
   return (
     <div className="space-y-8">
@@ -57,14 +59,16 @@ export default function TournamentsPage() {
       </div>
 
       <Card>
-        <Image 
-          src="https://picsum.photos/seed/301/1200/300" 
-          alt="Tournament Banner"
-          width={1200}
-          height={300}
-          data-ai-hint="stadium arena"
-          className="aspect-[4/1] w-full rounded-t-lg object-cover"
-        />
+        {tournamentBanner && (
+            <Image 
+                src={tournamentBanner.imageUrl}
+                alt="Tournament Banner"
+                width={1200}
+                height={300}
+                data-ai-hint={tournamentBanner.imageHint}
+                className="aspect-[4/1] w-full rounded-t-lg object-cover"
+            />
+        )}
         <CardHeader>
           <CardTitle>Weekly Trending Tournament: The Singularity Sprint</CardTitle>
           <CardDescription>A debate tournament about the future of AI.</CardDescription>

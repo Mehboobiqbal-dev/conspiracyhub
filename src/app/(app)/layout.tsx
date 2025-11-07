@@ -13,6 +13,7 @@ import { Logo } from "@/components/icons";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePathname } from 'next/navigation';
+import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 const pageTitles: { [key: string]: string } = {
     '/dashboard': 'Echo Chamber Simulator',
@@ -32,6 +33,7 @@ export default function AppLayout({
     const pathname = usePathname();
     const pageTitle = Object.keys(pageTitles).find(key => pathname.startsWith(key));
     const title = pageTitle ? pageTitles[pageTitle] : 'Opinion Arena Network';
+    const userAvatar = PlaceHolderImages.find(img => img.id === 'user-avatar-1');
 
     return (
         <SidebarProvider>
@@ -48,7 +50,7 @@ export default function AppLayout({
                 <SidebarFooter>
                     <div className="flex items-center gap-3">
                         <Avatar className="size-9">
-                            <AvatarImage src="https://picsum.photos/seed/101/100/100" alt="User Avatar" />
+                            {userAvatar && <AvatarImage src={userAvatar.imageUrl} alt="User Avatar" data-ai-hint={userAvatar.imageHint}/>}
                             <AvatarFallback>U</AvatarFallback>
                         </Avatar>
                         <div className="flex flex-col">
