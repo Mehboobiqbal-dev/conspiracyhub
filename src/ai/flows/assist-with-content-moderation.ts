@@ -43,7 +43,7 @@ Based on the content above, determine:
 2. toxicityScore: Provide a toxicity score between 0 and 1 (higher means more toxic).
 3. explanation: Explain why you consider the content toxic or not, citing specific parts of the text.
 
-Ensure your response adheres to the schema: {isToxic: boolean, toxicityScore: number, explanation: string}.',
+Ensure your response adheres to the schema: {isToxic: boolean, toxicityScore: number, explanation: string}.`,
   config: {
     safetySettings: [
       {category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_ONLY_HIGH'},
