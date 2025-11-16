@@ -93,8 +93,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const { post } = data;
   
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://conspiracyhub.com';
+  
   return {
-    title: `${post.title} | Conspiracy & Opinion Platform`,
+    title: `${post.title} | ConspiracyHub`,
     description: post.excerpt || post.content.substring(0, 160),
     openGraph: {
       title: post.title,
@@ -103,6 +105,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       publishedTime: post.createdAt.toISOString(),
       authors: post.authorName ? [post.authorName] : undefined,
       tags: post.tags,
+      url: `${baseUrl}/p/${post.slug}`,
+    },
+    alternates: {
+      canonical: `${baseUrl}/p/${post.slug}`,
     },
   };
 }
@@ -116,8 +122,33 @@ export default async function PostPage({ params }: PageProps) {
 
   const { post, topic, author, comments } = data;
 
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://conspiracyhub.com';
+
+  // Structured data for SEO
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: post.title,
+    description: post.excerpt || post.content.substring(0, 160),
+    author: {
+      '@type': 'Person',
+      name: post.authorName || 'Anonymous',
+    },
+    datePublished: post.createdAt.toISOString(),
+    dateModified: post.updatedAt?.toISOString() || post.createdAt.toISOString(),
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': `${baseUrl}/p/${post.slug}`,
+    },
+    keywords: post.tags?.join(', '),
+  };
+
   return (
     <div className="min-h-screen bg-background">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         {/* Breadcrumb */}
         <nav className="mb-6 text-sm text-muted-foreground">

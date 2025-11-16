@@ -5,139 +5,49 @@ import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ArrowUp, MessageCircle, Eye, Clock } from 'lucide-react';
+import { ArrowUp, MessageCircle, Eye, Clock, TrendingUp, Sparkles } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { PostFeed } from '@/components/post-feed';
 
 export const metadata: Metadata = {
-  title: 'Conspiracy & Opinion Platform - Latest Theories and Opinions',
+  title: 'ConspiracyHub - Latest Conspiracy Theories & Opinions',
   description: 'Explore conspiracy theories and opinions on current and historical topics. AI-generated and user-submitted content.',
   openGraph: {
-    title: 'Conspiracy & Opinion Platform',
+    title: 'ConspiracyHub',
     description: 'Explore conspiracy theories and opinions on current and historical topics.',
     type: 'website',
   },
 };
 
-async function getPosts() {
-  try {
-    const postsCollection = await getCollection<Post>('posts');
-    const posts = await postsCollection
-      .find({ status: 'published' })
-      .sort({ createdAt: -1 })
-      .limit(20)
-      .toArray();
-    
-    return posts.map(post => ({
-      ...post,
-      _id: post._id?.toString(),
-      topicId: post.topicId?.toString(),
-      authorId: post.authorId?.toString(),
-    }));
-  } catch (error) {
-    console.error('Error fetching posts:', error);
-    return [];
-  }
-}
-
 export default async function HomePage() {
-  const posts = await getPosts();
-
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         <div className="mb-8">
-          <h1 className="text-4xl font-headline font-bold mb-2">
-            Conspiracy & Opinion Platform
-          </h1>
-          <p className="text-muted-foreground text-lg">
-            Explore theories and opinions on current and historical topics
-          </p>
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h1 className="text-4xl font-headline font-bold mb-2">
+                ConspiracyHub
+              </h1>
+              <p className="text-muted-foreground text-lg">
+                Explore theories and opinions on current and historical topics
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <Button asChild variant="outline">
+                <Link href="/trending">
+                  <TrendingUp className="h-4 w-4 mr-1" />
+                  Trending
+                </Link>
+              </Button>
+              <Button asChild>
+                <Link href="/create">Create Post</Link>
+              </Button>
+            </div>
+          </div>
         </div>
 
-        <div className="flex gap-4 mb-6">
-          <Button asChild variant="default">
-            <Link href="/create">Create Post</Link>
-          </Button>
-          <Button asChild variant="outline">
-            <Link href="/topics">Browse Topics</Link>
-          </Button>
-        </div>
-
-        <div className="space-y-4">
-          {posts.length === 0 ? (
-            <Card>
-              <CardContent className="py-12 text-center">
-                <p className="text-muted-foreground">No posts yet. Be the first to share!</p>
-              </CardContent>
-            </Card>
-          ) : (
-            posts.map((post) => (
-              <Card key={post._id} className="hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Badge variant={post.type === 'conspiracy' ? 'destructive' : 'default'}>
-                          {post.type}
-                        </Badge>
-                        {post.isAIGenerated && (
-                          <Badge variant="secondary">AI Generated</Badge>
-                        )}
-                        {post.topicSlug && (
-                          <Link href={`/t/${post.topicSlug}`}>
-                            <Badge variant="outline">{post.topicSlug}</Badge>
-                          </Link>
-                        )}
-                      </div>
-                      <Link href={`/p/${post.slug}`}>
-                        <CardTitle className="text-2xl hover:text-primary transition-colors cursor-pointer">
-                          {post.title}
-                        </CardTitle>
-                      </Link>
-                      {post.excerpt && (
-                        <CardDescription className="mt-2 line-clamp-2">
-                          {post.excerpt}
-                        </CardDescription>
-                      )}
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center gap-6 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-1">
-                      <ArrowUp className="h-4 w-4" />
-                      <span>{post.upvotes}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <MessageCircle className="h-4 w-4" />
-                      <span>{post.commentCount}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Eye className="h-4 w-4" />
-                      <span>{post.views}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Clock className="h-4 w-4" />
-                      <span>{formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}</span>
-                    </div>
-                    {post.authorName && (
-                      <span>by {post.authorName}</span>
-                    )}
-                  </div>
-                  {post.tags && post.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mt-4">
-                      {post.tags.map((tag, idx) => (
-                        <Badge key={idx} variant="outline" className="text-xs">
-                          {tag}
-                        </Badge>
-                      ))}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            ))
-          )}
-        </div>
+        <PostFeed />
       </div>
     </div>
   );
