@@ -60,3 +60,6 @@ const generatePredictiveSimulationsFlow = ai.defineFlow(
     return output!;
   }
 );
+
+export const generatePredictiveSimulationsForTimeCapsules =
+  generatePredictiveSimulationsFlow;

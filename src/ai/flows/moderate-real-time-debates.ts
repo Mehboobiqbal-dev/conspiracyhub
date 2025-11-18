@@ -122,3 +122,4 @@ const moderateRealTimeDebateFlow = ai.defineFlow(
     return output!;
   }
 );
+export const moderateRealTimeDebates = moderateRealTimeDebateFlow;

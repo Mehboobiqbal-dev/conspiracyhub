@@ -4,7 +4,6 @@ import { Post } from '@/lib/models/post';
 import { UserStats } from '@/lib/models/user-activity';
 import { verifyAccessToken } from '@/lib/auth/jwt';
 import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -18,6 +17,8 @@ export const metadata: Metadata = {
   title: 'Your Feed - ConspiracyHub',
   description: 'Personalized feed based on your followed topics',
 };
+
+export const dynamic = 'force-dynamic';
 
 async function getUserFeed() {
   try {

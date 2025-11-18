@@ -9,12 +9,12 @@ import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ArrowUp, ArrowDown, MessageCircle, Eye, Clock, User as UserIcon } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
+import { ArrowUp, MessageCircle, Eye, Clock, User as UserIcon } from 'lucide-react';
 import { CommentSection } from '@/components/comment-section';
 import { PostVoteButtons } from '@/components/post-vote-buttons';
 import { PostActions } from '@/components/post-actions';
 import { PostMenu } from '@/components/post-menu';
+import { RelativeTime } from '@/components/relative-time';
 
 interface PageProps {
   params: { slug: string };
@@ -190,7 +190,7 @@ export default async function PostPage({ params }: PageProps) {
                     <div className="flex items-center gap-4 text-sm text-muted-foreground">
                       <div className="flex items-center gap-1">
                         <Clock className="h-4 w-4" />
-                        <span>{formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}</span>
+                        <RelativeTime date={post.createdAt} />
                       </div>
                       {author && (
                         <div className="flex items-center gap-1">
