@@ -11,9 +11,12 @@ import { ArrowUp, MessageCircle, Eye, Clock } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { ObjectId } from 'mongodb';
 import { Trophy, TrendingUp, MessageSquare, FileText } from 'lucide-react';
+import { UserFollowButton } from '@/components/user-follow-button';
+import { UserFollow } from '@/lib/models/user-follow';
+import { UserStats } from '@/lib/models/user-activity';
 
 interface PageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 async function getUserProfile(userId: string) {
@@ -25,6 +28,8 @@ async function getUserProfile(userId: string) {
 
     const postsCollection = await getCollection<Post>('posts');
     const commentsCollection = await getCollection('comments');
+    const followsCollection = await getCollection<UserFollow>('user_follows');
+    const statsCollection = await getCollection<UserStats>('user_stats');
     
     const posts = await postsCollection
       .find({ authorId: user._id, status: 'published' })
@@ -36,10 +41,11 @@ async function getUserProfile(userId: string) {
       .find({ authorId: user._id })
       .count();
 
-    // Calculate karma
-    const postKarma = posts.reduce((sum, post) => sum + post.upvotes - post.downvotes, 0);
-    const commentKarma = 0; // Would need to fetch comments for accurate calculation
-    const karma = postKarma + commentKarma;
+    const followerCount = await followsCollection.countDocuments({ followingId: user._id });
+    const followingCount = await followsCollection.countDocuments({ followerId: user._id });
+
+    const userStats = await statsCollection.findOne({ userId: user._id });
+    const karma = userStats?.karma || 0;
 
     return {
       user: {
@@ -54,6 +60,8 @@ async function getUserProfile(userId: string) {
         postCount: posts.length,
         commentCount: comments,
         karma,
+        followerCount,
+        followingCount,
       },
       posts: posts.map(post => ({
         ...post,
@@ -69,7 +77,8 @@ async function getUserProfile(userId: string) {
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const data = await getUserProfile(params.id);
+  const { id } = await params;
+  const data = await getUserProfile(id);
   
   if (!data) {
     return {
@@ -86,7 +95,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function UserProfilePage({ params }: PageProps) {
-  const data = await getUserProfile(params.id);
+  const { id } = await params;
+  const data = await getUserProfile(id);
 
   if (!data) {
     notFound();
