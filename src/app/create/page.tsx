@@ -1,17 +1,33 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useMemo, useEffect, useCallback } from 'react';
+import dynamic from 'next/dynamic';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/auth-context';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
-import { useEffect } from 'react';
+import { AIAssistButton } from '@/components/ai-assist-button';
+import { cn } from '@/lib/utils';
+
+const RichEditor = dynamic(() => import('@/components/rich-editor').then((mod) => mod.RichEditor), {
+  ssr: false,
+});
+
+interface DraftResponse {
+  draft: {
+    _id: string;
+    title: string;
+    content: string;
+    type: 'conspiracy' | 'opinion';
+    topicSlug?: string;
+    tags: string[];
+  };
+}
 
 export default function CreatePostPage() {
   const [title, setTitle] = useState('');
@@ -20,11 +36,15 @@ export default function CreatePostPage() {
   const [topicSlug, setTopicSlug] = useState('');
   const [tags, setTags] = useState('');
   const [loading, setLoading] = useState(false);
+  const [savingDraft, setSavingDraft] = useState(false);
+  const [draftId, setDraftId] = useState<string | null>(null);
+  const [initializingDraft, setInitializingDraft] = useState(true);
   const [topics, setTopics] = useState<Array<{ _id: string; name: string; slug: string }>>([]);
   const OPTIONAL_TOPIC_VALUE = useMemo(() => '__no_topic__', []);
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
   const { toast } = useToast();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     // Fetch topics
@@ -35,12 +55,48 @@ export default function CreatePostPage() {
   }, []);
 
   useEffect(() => {
+    const draftParam = searchParams.get('draft');
+    if (draftParam) {
+      loadDraft(draftParam);
+    } else {
+      setInitializingDraft(false);
+    }
+  }, [searchParams]);
+
+  const loadDraft = async (id: string) => {
+    try {
+      const response = await fetch(`/api/drafts/${id}`, {
+        credentials: 'include',
+      });
+      const data: DraftResponse = await response.json();
+      if (response.ok) {
+        setDraftId(data.draft._id);
+        setTitle(data.draft.title || '');
+        setContent(data.draft.content || '');
+        setType(data.draft.type);
+        setTopicSlug(data.draft.topicSlug || '');
+        setTags(data.draft.tags.join(', '));
+      } else {
+        throw new Error('Failed to load draft');
+      }
+    } catch (error: any) {
+      toast({
+        title: 'Error loading draft',
+        description: error.message || 'Failed to load draft',
+        variant: 'destructive',
+      });
+    } finally {
+      setInitializingDraft(false);
+    }
+  };
+
+  useEffect(() => {
     if (!authLoading && !user) {
       router.push('/login?redirect=/create');
     }
   }, [user, authLoading, router]);
 
-  if (authLoading) {
+  if (authLoading || initializingDraft) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin" />
@@ -52,9 +108,7 @@ export default function CreatePostPage() {
     return null; // Will redirect
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
+  const handlePublish = async () => {
     if (!user) {
       toast({
         title: 'Authentication Required',
@@ -74,7 +128,9 @@ export default function CreatePostPage() {
       return;
     }
 
-    if (content.length < 100) {
+    const plainContent = content.replace(/<[^>]*>/g, '').trim();
+
+    if (plainContent.length < 100) {
       toast({
         title: 'Content too short',
         description: 'Content must be at least 100 characters',
@@ -126,6 +182,65 @@ export default function CreatePostPage() {
     }
   };
 
+  const handleSaveDraft = async () => {
+    if (!user) {
+      router.push('/login?redirect=/create');
+      return;
+    }
+
+    if (!content.trim()) {
+      toast({
+        title: 'Content required',
+        description: 'Write something before saving a draft',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setSavingDraft(true);
+    try {
+      const payload = {
+        title,
+        content,
+        type,
+        topicSlug: topicSlug || undefined,
+        tags: tags.split(',').map(t => t.trim()).filter(Boolean),
+      };
+
+      const response = await fetch(draftId ? `/api/drafts/${draftId}` : '/api/drafts', {
+        method: draftId ? 'PUT' : 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to save draft');
+      }
+
+      if (!draftId) {
+        setDraftId(data.draft._id);
+        router.replace(`/create?draft=${data.draft._id}`);
+      }
+
+      toast({
+        title: 'Draft saved',
+        description: 'You can revisit this draft anytime from the Drafts page',
+      });
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to save draft',
+        variant: 'destructive',
+      });
+    } finally {
+      setSavingDraft(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8 max-w-3xl">
@@ -137,7 +252,7 @@ export default function CreatePostPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="type">Post Type</Label>
                 <Select value={type} onValueChange={(value: 'conspiracy' | 'opinion') => setType(value)}>
@@ -169,22 +284,17 @@ export default function CreatePostPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="content">Content *</Label>
-                <Textarea
-                  id="content"
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                  placeholder="Write your theory or opinion here..."
-                  required
-                  minLength={100}
-                  maxLength={10000}
-                  rows={15}
-                  disabled={loading}
-                  className="resize-none"
-                />
-                <p className="text-xs text-muted-foreground">
-                  {content.length}/10000 characters (minimum 100)
-                </p>
+                <div className="flex items-center justify-between">
+                  <Label>Content *</Label>
+                  <AIAssistButton
+                    onContentGenerated={(generated) => setContent((prev) => `${prev}\n${generated}`)}
+                    topic={title || topicSlug || undefined}
+                    type={type}
+                  />
+                </div>
+                <div className="border rounded-lg">
+                  <RichEditor content={content} onChange={setContent} placeholder="Write your theory or opinion..." />
+                </div>
               </div>
 
               <div className="space-y-2">
@@ -223,27 +333,43 @@ export default function CreatePostPage() {
                 </p>
               </div>
 
-              <div className="flex gap-4">
-                <Button type="submit" disabled={loading}>
+              <div className="flex flex-wrap gap-4">
+                <Button onClick={handlePublish} disabled={loading}>
                   {loading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Creating...
+                      Publishing...
                     </>
                   ) : (
-                    'Create Post'
+                    'Publish'
                   )}
                 </Button>
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => router.back()}
-                  disabled={loading}
+                  onClick={handleSaveDraft}
+                  disabled={savingDraft}
                 >
-                  Cancel
+                  {savingDraft ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Saving...
+                    </>
+                  ) : draftId ? (
+                    'Update Draft'
+                  ) : (
+                    'Save Draft'
+                  )}
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => router.push('/drafts')}
+                >
+                  View Drafts
                 </Button>
               </div>
-            </form>
+            </div>
           </CardContent>
         </Card>
       </div>

@@ -81,6 +81,28 @@ async function handler(request: NextRequest) {
         { _id: validated.parentId as any },
         { $inc: { replyCount: 1 } }
       );
+      
+      // Notify parent comment author
+      const parentComment = await commentsCollection.findOne({ _id: new ObjectId(validated.parentId) });
+      if (parentComment?.authorId && parentComment.authorId.toString() !== userId) {
+        await notifyCommentReply(
+          parentComment.authorId.toString(),
+          userId,
+          validated.postId,
+          validated.parentId,
+          post.title
+        );
+      }
+    } else {
+      // Notify post author (if not the commenter)
+      if (post.authorId && post.authorId.toString() !== userId) {
+        await notifyPostReply(
+          post.authorId.toString(),
+          userId,
+          validated.postId,
+          post.title
+        );
+      }
     }
 
     return NextResponse.json({

@@ -13,7 +13,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Search, Plus, User, LogOut, Settings, Home, TrendingUp, Bookmark } from 'lucide-react';
+import { Search, Plus, User, LogOut, Settings, Home, TrendingUp, Bookmark, FileText } from 'lucide-react';
+import { NotificationBell } from './notification-bell';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
@@ -81,6 +82,7 @@ export function MainNav() {
                     Create
                   </Link>
                 </Button>
+                <NotificationBell />
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="relative h-10 w-10 rounded-full">
@@ -108,6 +110,12 @@ export function MainNav() {
                       <Link href="/saved">
                         <Bookmark className="mr-2 h-4 w-4" />
                         Saved Posts
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/drafts">
+                        <FileText className="mr-2 h-4 w-4" />
+                        Drafts
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
