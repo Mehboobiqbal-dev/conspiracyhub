@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAuth } from '@/lib/middleware/auth';
 import { promises as fs } from 'fs';
 import path from 'path';
 import crypto from 'crypto';
@@ -6,7 +7,7 @@ import crypto from 'crypto';
 const MAX_FILE_BYTES = 5 * 1024 * 1024; // 5MB
 const ALLOWED_MIME = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'];
 
-export async function POST(request: NextRequest) {
+async function handler(request: NextRequest) {
   try {
     const formData = await request.formData();
     const file = formData.get('file');
@@ -53,4 +54,6 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+export const POST = requireAuth(handler);
 
