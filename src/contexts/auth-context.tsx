@@ -5,21 +5,37 @@ import { User, getCurrentUser, logout as logoutUser } from '@/lib/auth/client';
 import { useRouter } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import type { RootState } from '@/store/store';
-import { clearUser, setLoading, setUser } from '@/store/auth-slice';
+import { clearUser, setLoading, setTokens, setUser } from '@/store/auth-slice';
+
+interface LoginPayload {
+  user: User;
+  accessToken?: string | null;
+  refreshToken?: string | null;
+}
+
+interface TokenPayload {
+  accessToken?: string | null;
+  refreshToken?: string | null;
+}
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  login: (user: User) => void;
+  accessToken: string | null;
+  refreshToken: string | null;
+  login: (payload: LoginPayload) => void;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
+  updateTokens: (tokens: TokenPayload) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const dispatch = useAppDispatch();
-  const { user, loading } = useAppSelector((state: RootState) => state.auth);
+  const { user, loading, accessToken, refreshToken } = useAppSelector(
+    (state: RootState) => state.auth
+  );
   const router = useRouter();
 
   const refreshUser = async () => {
@@ -38,8 +54,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const login = (userData: User) => {
+  const login = ({ user: userData, accessToken: at, refreshToken: rt }: LoginPayload) => {
     dispatch(setUser(userData));
+    dispatch(setTokens({ accessToken: at ?? null, refreshToken: rt ?? null }));
+  };
+
+  const updateTokens = (tokens: TokenPayload) => {
+    dispatch(setTokens(tokens));
   };
 
   const logout = async () => {
@@ -55,7 +76,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, refreshUser }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        accessToken,
+        refreshToken,
+        login,
+        logout,
+        refreshUser,
+        updateTokens,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

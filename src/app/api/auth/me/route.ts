@@ -2,12 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/middleware/auth';
 import { getCollection } from '@/lib/db/mongodb';
 import { User, sanitizeUser } from '@/lib/models/user';
+import { ObjectId } from 'mongodb';
 
 async function handler(request: NextRequest) {
   try {
     const userId = (request as any).user.userId;
     const usersCollection = await getCollection<User>('users');
-    const user = await usersCollection.findOne({ _id: userId as any });
+    const user = await usersCollection.findOne({ _id: new ObjectId(userId) });
 
     if (!user) {
       return NextResponse.json(

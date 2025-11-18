@@ -20,6 +20,7 @@ export async function login(email: string, password: string): Promise<AuthRespon
     headers: {
       'Content-Type': 'application/json',
     },
+    credentials: 'include',
     body: JSON.stringify({ email, password }),
   });
 
@@ -37,6 +38,7 @@ export async function register(name: string, email: string, password: string): P
     headers: {
       'Content-Type': 'application/json',
     },
+    credentials: 'include',
     body: JSON.stringify({ name, email, password }),
   });
 
@@ -51,6 +53,7 @@ export async function register(name: string, email: string, password: string): P
 export async function logout(): Promise<void> {
   await fetch('/api/auth/logout', {
     method: 'POST',
+    credentials: 'include',
   });
   
   // Clear any client-side storage

@@ -20,7 +20,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { login: setAuthUser } = useAuth();
+  const { login: setAuthSession } = useAuth();
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -35,7 +35,11 @@ export default function LoginPage() {
         response = await register(name, email, password);
       }
 
-      setAuthUser(response.user);
+      setAuthSession({
+        user: response.user,
+        accessToken: response.accessToken,
+        refreshToken: response.refreshToken,
+      });
       toast({
         title: 'Success',
         description: isLogin ? 'Logged in successfully!' : 'Account created successfully!',
