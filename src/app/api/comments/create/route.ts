@@ -6,6 +6,7 @@ import { Post } from '@/lib/models/post';
 import { User } from '@/lib/models/user';
 import { z } from 'zod';
 import { ObjectId } from 'mongodb';
+import { notifyCommentReply, notifyPostReply } from '@/lib/utils/notifications';
 
 const createCommentSchema = z.object({
   postId: z.string(),
