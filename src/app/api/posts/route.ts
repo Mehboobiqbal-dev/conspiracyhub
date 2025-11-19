@@ -27,6 +27,7 @@ export async function GET(request: NextRequest) {
     }
 
     let sortQuery: any = {};
+    let useInMemorySort = false;
     const now = new Date();
     
     switch (sort) {
@@ -35,7 +36,7 @@ export async function GET(request: NextRequest) {
         sortQuery = { upvotes: -1, createdAt: -1 };
         break;
       case 'trending':
-        // Recent posts with high engagement
+        // Recent posts with high engagement (last 24 hours)
         const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
         query.createdAt = { $gte: oneDayAgo };
         sortQuery = { 
@@ -49,47 +50,67 @@ export async function GET(request: NextRequest) {
         // Posts from last 7 days, weighted by engagement
         const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
         query.createdAt = { $gte: sevenDaysAgo };
-        sortQuery = { 
-          $expr: {
-            $add: [
-              { $multiply: ['$upvotes', 2] },
-              { $multiply: ['$commentCount', 3] },
-              { $multiply: [{ $subtract: [now, '$createdAt'] }, -0.0001] }
-            ]
-          }
-        };
+        useInMemorySort = true;
+        sortQuery = { createdAt: -1 }; // Initial sort, will re-sort in memory
         break;
       case 'controversial':
         // High engagement but close upvote/downvote ratio
-        sortQuery = { 
-          $expr: {
-            $subtract: [
-              { $add: ['$upvotes', '$downvotes'] },
-              { $abs: { $subtract: ['$upvotes', '$downvotes'] } }
-            ]
-          }
-        };
+        useInMemorySort = true;
+        sortQuery = { createdAt: -1 }; // Initial sort, will re-sort in memory
         break;
       case 'top':
-        // Top posts of all time
-        sortQuery = { 
-          $expr: {
-            $subtract: ['$upvotes', '$downvotes']
-          }
-        };
+        // Top posts of all time (score = upvotes - downvotes)
+        sortQuery = { upvotes: -1, createdAt: -1 };
         break;
       default: // newest
         sortQuery = { createdAt: -1 };
     }
 
     const skip = (page - 1) * limit;
+    const fetchLimit = useInMemorySort ? Math.min(limit * 3, 100) : limit; // Fetch more for in-memory sorting
 
-    const posts = await postsCollection
+    let posts = await postsCollection
       .find(query)
       .sort(sortQuery)
-      .skip(skip)
-      .limit(limit)
+      .limit(fetchLimit)
       .toArray();
+
+    // Apply in-memory sorting for complex algorithms
+    if (useInMemorySort) {
+      posts = posts.map(post => {
+        const score = post.upvotes - post.downvotes;
+        const totalVotes = post.upvotes + post.downvotes;
+        const hoursSinceCreation = (now.getTime() - post.createdAt.getTime()) / (1000 * 60 * 60);
+        
+        let sortScore = 0;
+        if (sort === 'hot') {
+          // Reddit-style hot: log(score) * sign(score) - hours/12
+          const sign = score > 0 ? 1 : score < 0 ? -1 : 0;
+          const order = Math.log10(Math.max(Math.abs(score), 1));
+          sortScore = sign * order - hoursSinceCreation / 12;
+        } else if (sort === 'controversial') {
+          // Controversial: high total votes but close ratio
+          const voteDiff = Math.abs(post.upvotes - post.downvotes);
+          sortScore = totalVotes > 0 ? (totalVotes - voteDiff) / totalVotes : 0;
+        }
+        return { ...post, _sortScore: sortScore };
+      });
+
+      posts.sort((a, b) => {
+        if (sort === 'hot') {
+          return (b as any)._sortScore - (a as any)._sortScore;
+        } else if (sort === 'controversial') {
+          return (b as any)._sortScore - (a as any)._sortScore;
+        }
+        return 0;
+      });
+
+      // Remove sort score and apply pagination
+      posts = posts.slice(skip, skip + limit).map(({ _sortScore, ...post }) => post);
+    } else {
+      // Apply skip for non-in-memory sorts
+      posts = posts.slice(skip, skip + limit);
+    }
 
     const total = await postsCollection.countDocuments(query);
 

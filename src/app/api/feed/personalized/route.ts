@@ -11,6 +11,9 @@ async function handler(request: NextRequest) {
     const userId = (request as any).user.userId;
     const { searchParams } = new URL(request.url);
     const limit = parseInt(searchParams.get('limit') || '50');
+    const page = parseInt(searchParams.get('page') || '1');
+    const sort = searchParams.get('sort') || 'newest';
+    const type = searchParams.get('type') as 'conspiracy' | 'opinion' | null;
 
     const statsCollection = await getCollection<UserStats>('user_stats');
     const followsCollection = await getCollection<UserFollow>('user_follows');
@@ -29,19 +32,41 @@ async function handler(request: NextRequest) {
     // Build query: posts from followed topics OR followed users
     const query: any = {
       status: 'published',
-      $or: [
-        ...(followedTopics.length > 0 ? [{ topicId: { $in: followedTopics } }] : []),
-        ...(followedUserIds.length > 0 ? [{ authorId: { $in: followedUserIds } }] : []),
-      ],
     };
 
-    // If no follows, return empty or trending posts
+    if (type) {
+      query.type = type;
+    }
+
+    // If no follows, return trending posts
     if (followedTopics.length === 0 && followedUserIds.length === 0) {
+      let sortQuery: any = { createdAt: -1 };
+      const now = new Date();
+      
+      switch (sort) {
+        case 'hot':
+        case 'trending':
+          const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+          query.createdAt = { $gte: sevenDaysAgo };
+          sortQuery = { upvotes: -1, commentCount: -1, createdAt: -1 };
+          break;
+        case 'popular':
+        case 'top':
+          sortQuery = { upvotes: -1, createdAt: -1 };
+          break;
+        default:
+          sortQuery = { createdAt: -1 };
+      }
+
+      const skip = (page - 1) * limit;
       const trendingPosts = await postsCollection
-        .find({ status: 'published' })
-        .sort({ upvotes: -1, createdAt: -1 })
+        .find(query)
+        .sort(sortQuery)
+        .skip(skip)
         .limit(limit)
         .toArray();
+
+      const total = await postsCollection.countDocuments(query);
 
       return NextResponse.json({
         posts: trendingPosts.map(post => ({
@@ -51,14 +76,49 @@ async function handler(request: NextRequest) {
           authorId: post.authorId?.toString(),
         })),
         source: 'trending',
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit),
+        },
       });
     }
 
+    // Build personalized query
+    query.$or = [
+      ...(followedTopics.length > 0 ? [{ topicId: { $in: followedTopics } }] : []),
+      ...(followedUserIds.length > 0 ? [{ authorId: { $in: followedUserIds } }] : []),
+    ];
+
+    // Apply sorting
+    let sortQuery: any = { createdAt: -1 };
+    const now = new Date();
+    
+    switch (sort) {
+      case 'hot':
+      case 'trending':
+        const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        query.createdAt = { ...query.createdAt, $gte: sevenDaysAgo };
+        sortQuery = { upvotes: -1, commentCount: -1, createdAt: -1 };
+        break;
+      case 'popular':
+      case 'top':
+        sortQuery = { upvotes: -1, createdAt: -1 };
+        break;
+      default:
+        sortQuery = { createdAt: -1 };
+    }
+
+    const skip = (page - 1) * limit;
     const posts = await postsCollection
       .find(query)
-      .sort({ createdAt: -1 })
+      .sort(sortQuery)
+      .skip(skip)
       .limit(limit)
       .toArray();
+
+    const total = await postsCollection.countDocuments(query);
 
     return NextResponse.json({
       posts: posts.map(post => ({
@@ -68,6 +128,12 @@ async function handler(request: NextRequest) {
         authorId: post.authorId?.toString(),
       })),
       source: 'personalized',
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
     });
   } catch (error) {
     console.error('Error fetching personalized feed:', error);

@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowUp, MessageCircle, Eye, Clock } from 'lucide-react';
+import { ArrowUp, MessageCircle, Eye, Clock, Loader2 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
 interface Post {
@@ -29,34 +29,78 @@ interface Post {
 
 interface PostFeedProps {
   initialPosts?: Post[];
+  feedType?: 'public' | 'personalized';
+  topicSlug?: string;
 }
 
-export function PostFeed({ initialPosts }: PostFeedProps = {}) {
+export function PostFeed({ initialPosts, feedType = 'public', topicSlug }: PostFeedProps = {}) {
   const [posts, setPosts] = useState<Post[]>(initialPosts || []);
   const [loading, setLoading] = useState(!initialPosts);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [sort, setSort] = useState('newest');
   const [type, setType] = useState<'all' | 'conspiracy' | 'opinion'>('all');
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [pagination, setPagination] = useState<{
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  } | null>(null);
 
-  useEffect(() => {
-    if (!initialPosts) {
-      fetchPosts();
+  const fetchPosts = useCallback(async (pageNum: number = 1, append: boolean = false) => {
+    if (append) {
+      setLoadingMore(true);
+    } else {
+      setLoading(true);
     }
-  }, [sort, type, initialPosts]);
 
-  const fetchPosts = async () => {
-    setLoading(true);
     try {
       const params = new URLSearchParams({
+        page: pageNum.toString(),
         sort,
         ...(type !== 'all' && { type }),
+        ...(topicSlug && { topic: topicSlug }),
       });
-      const response = await fetch(`/api/posts?${params}`);
+
+      const endpoint = feedType === 'personalized' 
+        ? `/api/feed/personalized?${params}`
+        : `/api/posts?${params}`;
+
+      const response = await fetch(endpoint, {
+        credentials: 'include',
+      });
       const data = await response.json();
-      setPosts(data.posts || []);
+
+      if (data.posts) {
+        if (append) {
+          setPosts(prev => [...prev, ...data.posts]);
+        } else {
+          setPosts(data.posts);
+        }
+        setPagination(data.pagination || null);
+        setHasMore(data.pagination ? pageNum < data.pagination.totalPages : false);
+      }
     } catch (error) {
       console.error('Error fetching posts:', error);
     } finally {
       setLoading(false);
+      setLoadingMore(false);
+    }
+  }, [sort, type, feedType, topicSlug]);
+
+  useEffect(() => {
+    if (!initialPosts) {
+      setPage(1);
+      fetchPosts(1, false);
+    }
+  }, [sort, type, feedType, topicSlug]);
+
+  const loadMore = () => {
+    if (!loadingMore && hasMore) {
+      const nextPage = page + 1;
+      setPage(nextPage);
+      fetchPosts(nextPage, true);
     }
   };
 
