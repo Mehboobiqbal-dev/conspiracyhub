@@ -117,13 +117,16 @@ export default async function UserProfilePage({ params }: PageProps) {
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1">
-                <CardTitle className="text-3xl mb-2">{user.name}</CardTitle>
+                <div className="flex items-start justify-between mb-2">
+                  <CardTitle className="text-3xl">{user.name}</CardTitle>
+                  <UserFollowButton userId={user._id} />
+                </div>
                 {user.bio && (
                   <CardDescription className="text-base mt-2">
                     {user.bio}
                   </CardDescription>
                 )}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+                <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mt-6">
                   <div className="flex items-center gap-2">
                     <Trophy className="h-5 w-5 text-primary" />
                     <div>
@@ -152,6 +155,20 @@ export default async function UserProfilePage({ params }: PageProps) {
                       <div className="text-xs text-muted-foreground">Member Since</div>
                     </div>
                   </div>
+                  <Link href={`/u/${user._id}/followers`} className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer">
+                    <UserIcon className="h-5 w-5 text-primary" />
+                    <div>
+                      <div className="text-2xl font-bold">{stats.followerCount}</div>
+                      <div className="text-xs text-muted-foreground">Followers</div>
+                    </div>
+                  </Link>
+                  <Link href={`/u/${user._id}/following`} className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer">
+                    <UserIcon className="h-5 w-5 text-primary" />
+                    <div>
+                      <div className="text-2xl font-bold">{stats.followingCount}</div>
+                      <div className="text-xs text-muted-foreground">Following</div>
+                    </div>
+                  </Link>
                 </div>
               </div>
             </div>

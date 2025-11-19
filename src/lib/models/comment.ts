@@ -15,6 +15,11 @@ export interface Comment {
   updatedAt: Date;
   isEdited: boolean;
   isDeleted: boolean;
+  reportCount?: number;
+  moderationStatus?: 'pending' | 'approved' | 'removed';
+  moderatedBy?: ObjectId;
+  moderatedAt?: Date;
+  moderationReason?: string;
 }
 
 export interface CommentWithReplies extends Comment {

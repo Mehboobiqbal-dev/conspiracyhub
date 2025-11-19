@@ -22,6 +22,11 @@ export interface Post {
   publishedAt?: Date;
   featuredImage?: string;
   excerpt?: string; // For SEO meta description
+  reportCount?: number;
+  moderationStatus?: 'pending' | 'approved' | 'removed';
+  moderatedBy?: ObjectId;
+  moderatedAt?: Date;
+  moderationReason?: string;
 }
 
 export interface PostWithDetails extends Post {
