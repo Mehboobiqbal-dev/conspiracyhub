@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect, useCallback } from 'react';
+import { useState, useMemo, useEffect, useCallback, Suspense } from 'react';
 import dynamic from 'next/dynamic';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/auth-context';
@@ -29,7 +29,7 @@ interface DraftResponse {
   };
 }
 
-export default function CreatePostPage() {
+function CreatePostPageContent() {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [type, setType] = useState<'conspiracy' | 'opinion'>('conspiracy');
