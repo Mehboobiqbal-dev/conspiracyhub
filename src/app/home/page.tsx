@@ -1,8 +1,7 @@
-'use server';
+'use server'
 
 import { redirect } from 'next/navigation';
 
-export default function LegacyHomeRedirect() {
+export default async function LegacyHomeRedirect() {
   redirect('/');
 }
-
