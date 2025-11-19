@@ -19,24 +19,11 @@ async function getTopicData(slug: string) {
 
     if (!topic) return null;
 
-    const postsCollection = await getCollection<Post>('posts');
-    const posts = await postsCollection
-      .find({ topicSlug: slug, status: 'published' })
-      .sort({ createdAt: -1 })
-      .limit(20)
-      .toArray();
-
     return {
       topic: {
         ...topic,
         _id: topic._id?.toString(),
       },
-      posts: posts.map(post => ({
-        ...post,
-        _id: post._id?.toString(),
-        topicId: post.topicId?.toString(),
-        authorId: post.authorId?.toString(),
-      })),
     };
   } catch (error) {
     console.error('Error fetching topic:', error);
@@ -75,10 +62,29 @@ export default async function TopicPage({ params }: PageProps) {
     notFound();
   }
 
-  const { topic, posts } = data;
+  const { topic } = data;
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://conspiracyhub.com';
+
+  // Structured data for SEO
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: topic.name,
+    description: topic.description || `Explore ${topic.name} conspiracy theories and opinions`,
+    url: `${baseUrl}/t/${topic.slug}`,
+    mainEntity: {
+      '@type': 'ItemList',
+      name: `${topic.name} Posts`,
+      numberOfItems: topic.postCount || 0,
+    },
+  };
 
   return (
     <div className="min-h-screen bg-background">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         {/* Breadcrumb */}
         <nav className="mb-6 text-sm text-muted-foreground">
@@ -97,78 +103,15 @@ export default async function TopicPage({ params }: PageProps) {
                 <p className="text-muted-foreground text-lg">{topic.description}</p>
               )}
               <div className="flex items-center gap-4 mt-4 text-sm text-muted-foreground">
-                <span>{topic.postCount} posts</span>
-                <span>{topic.followerCount} followers</span>
+                <span>{topic.postCount || 0} posts</span>
+                <span>{topic.followerCount || 0} followers</span>
               </div>
             </div>
-            <TopicFollowButton topicSlug={topic.slug} initialFollowerCount={topic.followerCount} />
+            <TopicFollowButton topicSlug={topic.slug} initialFollowerCount={topic.followerCount || 0} />
           </div>
         </div>
 
-        <div className="space-y-4">
-          {posts.length === 0 ? (
-            <Card>
-              <CardContent className="py-12 text-center">
-                <p className="text-muted-foreground">No posts in this topic yet.</p>
-                <Link href="/create">
-                  <Badge className="mt-4 cursor-pointer">Create First Post</Badge>
-                </Link>
-              </CardContent>
-            </Card>
-          ) : (
-            posts.map((post) => (
-              <Card key={post._id} className="hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Badge variant={post.type === 'conspiracy' ? 'destructive' : 'default'}>
-                          {post.type}
-                        </Badge>
-                        {post.isAIGenerated && (
-                          <Badge variant="secondary">AI Generated</Badge>
-                        )}
-                      </div>
-                      <Link href={`/p/${post.slug}`}>
-                        <CardTitle className="text-2xl hover:text-primary transition-colors cursor-pointer">
-                          {post.title}
-                        </CardTitle>
-                      </Link>
-                      {post.excerpt && (
-                        <CardDescription className="mt-2 line-clamp-2">
-                          {post.excerpt}
-                        </CardDescription>
-                      )}
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center gap-6 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-1">
-                      <ArrowUp className="h-4 w-4" />
-                      <span>{post.upvotes}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <MessageCircle className="h-4 w-4" />
-                      <span>{post.commentCount}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Eye className="h-4 w-4" />
-                      <span>{post.views}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Clock className="h-4 w-4" />
-                      <span>{formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}</span>
-                    </div>
-                    {post.authorName && (
-                      <span>by {post.authorName}</span>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            ))
-          )}
-        </div>
+        <PostFeed feedType="public" topicSlug={slug} />
       </div>
     </div>
   );
