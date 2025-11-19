@@ -93,8 +93,12 @@ export function PostFeed({ initialPosts, feedType = 'public', topicSlug }: PostF
     if (!initialPosts) {
       setPage(1);
       fetchPosts(1, false);
+    } else {
+      // If initialPosts provided, use them and set pagination
+      setPosts(initialPosts);
+      setHasMore(false);
     }
-  }, [sort, type, feedType, topicSlug]);
+  }, [sort, type, feedType, topicSlug, fetchPosts, initialPosts]);
 
   const loadMore = () => {
     if (!loadingMore && hasMore) {
@@ -104,7 +108,7 @@ export function PostFeed({ initialPosts, feedType = 'public', topicSlug }: PostF
     }
   };
 
-  if (loading) {
+  if (loading && posts.length === 0) {
     return (
       <div className="space-y-4">
         {[...Array(5)].map((_, i) => (
@@ -122,8 +126,11 @@ export function PostFeed({ initialPosts, feedType = 'public', topicSlug }: PostF
   return (
     <div className="space-y-6">
       {/* Filters */}
-      <div className="flex gap-4 items-center">
-        <Select value={sort} onValueChange={setSort}>
+      <div className="flex gap-4 items-center flex-wrap">
+        <Select value={sort} onValueChange={(value) => {
+          setSort(value);
+          setPage(1);
+        }}>
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Sort by" />
           </SelectTrigger>
@@ -137,7 +144,10 @@ export function PostFeed({ initialPosts, feedType = 'public', topicSlug }: PostF
           </SelectContent>
         </Select>
 
-        <Select value={type} onValueChange={(value: 'all' | 'conspiracy' | 'opinion') => setType(value)}>
+        <Select value={type} onValueChange={(value: 'all' | 'conspiracy' | 'opinion') => {
+          setType(value);
+          setPage(1);
+        }}>
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Filter by type" />
           </SelectTrigger>
@@ -147,6 +157,12 @@ export function PostFeed({ initialPosts, feedType = 'public', topicSlug }: PostF
             <SelectItem value="opinion">Opinion</SelectItem>
           </SelectContent>
         </Select>
+
+        {pagination && (
+          <div className="text-sm text-muted-foreground ml-auto">
+            Showing {posts.length} of {pagination.total} posts
+          </div>
+        )}
       </div>
 
       {/* Posts */}
@@ -227,6 +243,33 @@ export function PostFeed({ initialPosts, feedType = 'public', topicSlug }: PostF
           ))
         )}
       </div>
+
+      {/* Load More Button */}
+      {hasMore && (
+        <div className="flex justify-center pt-4">
+          <Button
+            onClick={loadMore}
+            disabled={loadingMore}
+            variant="outline"
+            className="w-full sm:w-auto"
+          >
+            {loadingMore ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Loading...
+              </>
+            ) : (
+              'Load More'
+            )}
+          </Button>
+        </div>
+      )}
+
+      {!hasMore && posts.length > 0 && (
+        <div className="text-center text-muted-foreground py-4">
+          No more posts to load
+        </div>
+      )}
     </div>
   );
 }

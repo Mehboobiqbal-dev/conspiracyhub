@@ -27,8 +27,31 @@ export const metadata: Metadata = {
 };
 
 export default async function HomePage() {
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://conspiracyhub.com';
+
+  // Structured data for SEO
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'ConspiracyHub',
+    description: 'Explore conspiracy theories and opinions on current and historical topics. AI-generated and user-submitted content.',
+    url: baseUrl,
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: {
+        '@type': 'EntryPoint',
+        urlTemplate: `${baseUrl}/search?q={search_term_string}`,
+      },
+      'query-input': 'required name=search_term_string',
+    },
+  };
+
   return (
     <div className="min-h-screen bg-background">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
@@ -54,7 +77,7 @@ export default async function HomePage() {
           </div>
         </div>
 
-        <PostFeed />
+        <PostFeed feedType="public" />
       </div>
     </div>
   );

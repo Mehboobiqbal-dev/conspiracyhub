@@ -2,13 +2,11 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getCollection } from '@/lib/db/mongodb';
 import { Topic } from '@/lib/models/topic';
-import { Post } from '@/lib/models/post';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowUp, MessageCircle, Eye, Clock } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
 import { TopicFollowButton } from '@/components/topic-follow-button';
+import { PostFeed } from '@/components/post-feed';
 
 interface PageProps {
   params: { slug: string } | Promise<{ slug: string }>;

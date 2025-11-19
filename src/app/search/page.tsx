@@ -162,8 +162,48 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       ? await searchTopics(query)
       : [];
 
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://conspiracyhub.com';
+
+  // Structured data for search results
+  const structuredData = query ? {
+    '@context': 'https://schema.org',
+    '@type': 'SearchResultsPage',
+    name: `Search Results for "${query}"`,
+    url: `${baseUrl}/search?q=${encodeURIComponent(query)}`,
+    mainEntity: {
+      '@type': 'ItemList',
+      numberOfItems: posts.length + topics.length,
+      itemListElement: [
+        ...posts.slice(0, 10).map((post, index) => ({
+          '@type': 'ListItem',
+          position: index + 1,
+          item: {
+            '@type': 'Article',
+            headline: post.title,
+            url: `${baseUrl}/p/${post.slug}`,
+          },
+        })),
+        ...topics.slice(0, 10).map((topic, index) => ({
+          '@type': 'ListItem',
+          position: posts.length + index + 1,
+          item: {
+            '@type': 'Thing',
+            name: topic.name,
+            url: `${baseUrl}/t/${topic.slug}`,
+          },
+        })),
+      ],
+    },
+  } : null;
+
   return (
     <div className="min-h-screen bg-background">
+      {structuredData && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
+      )}
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         <div className="mb-8">
           <h1 className="text-3xl font-headline font-bold mb-2">
