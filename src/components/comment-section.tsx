@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useAuth } from '@/contexts/auth-context';
+import { authenticatedFetch } from '@/lib/auth/fetch';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -122,7 +123,6 @@ export function CommentSection({ postId, postSlug }: CommentSectionProps) {
     setSubmitting(true);
 
     try {
-      const { authenticatedFetch } = await import('@/lib/auth/fetch');
       const response = await authenticatedFetch('/api/comments/create', {
         method: 'POST',
         headers: {

@@ -98,8 +98,20 @@ async function handler(request: NextRequest) {
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
+    // On Vercel, always use Cloudinary (filesystem is read-only)
+    const isVercel = process.env.VERCEL === '1';
+    
     // Check if Cloudinary is configured
-    if (isCloudinaryConfigured()) {
+    if (isCloudinaryConfigured() || isVercel) {
+      if (isVercel && !isCloudinaryConfigured()) {
+        return NextResponse.json(
+          { 
+            error: 'Cloudinary is required for file uploads on Vercel',
+            details: 'Please configure CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET environment variables'
+          },
+          { status: 500 }
+        );
+      }
       // Use Cloudinary for uploads (production-ready)
       try {
         const resourceType = kind === 'video' ? 'video' : 'image';

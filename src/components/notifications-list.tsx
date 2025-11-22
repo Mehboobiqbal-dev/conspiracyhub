@@ -8,6 +8,7 @@ import { Loader2, CheckCheck } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
+import { authenticatedFetch } from '@/lib/auth/fetch';
 
 interface Notification {
   _id: string;
@@ -31,9 +32,7 @@ export function NotificationsList() {
 
   const fetchNotifications = async () => {
     try {
-      const response = await fetch('/api/notifications?limit=100', {
-        credentials: 'include',
-      });
+      const response = await authenticatedFetch('/api/notifications?limit=100');
       const data = await response.json();
       if (response.ok) {
         setNotifications(data.notifications || []);
@@ -48,9 +47,8 @@ export function NotificationsList() {
   const markAllAsRead = async () => {
     setMarkingAll(true);
     try {
-      const response = await fetch('/api/notifications/read-all', {
+      const response = await authenticatedFetch('/api/notifications/read-all', {
         method: 'POST',
-        credentials: 'include',
       });
       if (response.ok) {
         toast({
@@ -71,9 +69,8 @@ export function NotificationsList() {
 
   const markAsRead = async (id: string) => {
     try {
-      await fetch(`/api/notifications/${id}/read`, {
+      await authenticatedFetch(`/api/notifications/${id}/read`, {
         method: 'POST',
-        credentials: 'include',
       });
       fetchNotifications();
     } catch (error) {

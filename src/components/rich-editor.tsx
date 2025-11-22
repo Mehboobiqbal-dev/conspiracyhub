@@ -266,6 +266,7 @@ export function RichEditor({
     extensions: [
       StarterKit.configure({
         heading: false,
+        codeBlock: false, // Disable default codeBlock since we're using CodeBlockLowlight
       }),
       Heading.configure({
         levels: [1, 2, 3],
