@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/contexts/auth-context';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -27,9 +28,11 @@ import { Search, Plus, User, LogOut, Settings, TrendingUp, Bookmark, FileText, M
 import { NotificationBell } from './notification-bell';
 import { DraftsTray } from './drafts-tray';
 import { FollowSuggestionsTray } from './follow-suggestions-tray';
+import { LanguageSelector } from './language-selector';
 import { cn } from '@/lib/utils';
 
 export function MainNav() {
+  const t = useTranslations('nav');
   const { user, logout } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
@@ -38,16 +41,16 @@ export function MainNav() {
 
   const quickLinks = useMemo(
     () => [
-      { label: 'Home', href: '/' },
-      { label: 'Feed', href: '/feed', authOnly: true },
-      { label: 'Trending', href: '/trending' },
-      { label: 'Topics', href: '/topics' },
-      { label: 'Search', href: '/search' },
-      { label: 'Saved', href: '/saved', authOnly: true },
-      { label: 'Drafts', href: '/drafts', authOnly: true },
-      { label: 'Notifications', href: '/notifications', authOnly: true },
+      { label: t('home'), href: '/', key: 'home' },
+      { label: t('feed'), href: '/feed', authOnly: true, key: 'feed' },
+      { label: t('trending'), href: '/trending', key: 'trending' },
+      { label: t('topics'), href: '/topics', key: 'topics' },
+      { label: t('search'), href: '/search', key: 'search' },
+      { label: t('saved'), href: '/saved', authOnly: true, key: 'saved' },
+      { label: t('drafts'), href: '/drafts', authOnly: true, key: 'drafts' },
+      { label: t('notifications'), href: '/notifications', authOnly: true, key: 'notifications' },
     ],
-    []
+    [t]
   );
 
   const visibleLinks = quickLinks.filter((link) => !link.authOnly || user);
@@ -74,14 +77,14 @@ export function MainNav() {
               </SheetTrigger>
               <SheetContent side="left">
                 <SheetHeader>
-                  <SheetTitle>Navigate ConspiracyHub</SheetTitle>
-                  <SheetDescription>Jump to feeds, drafts, notifications, and topics.</SheetDescription>
+                  <SheetTitle>{t('navigateTitle')}</SheetTitle>
+                  <SheetDescription>{t('navigateDescription')}</SheetDescription>
                 </SheetHeader>
                 <div className="mt-6 space-y-4">
                   <div className="flex flex-col gap-2">
                     {visibleLinks.map((link) => (
                       <Link
-                        key={link.href}
+                        key={link.key || link.href}
                         href={link.href}
                         onClick={() => setMobileNavOpen(false)}
                         className={cn(
@@ -97,16 +100,16 @@ export function MainNav() {
                     <Button asChild>
                       <Link href="/create" onClick={() => setMobileNavOpen(false)}>
                         <Plus className="h-4 w-4 mr-1" />
-                        Create post
+                        {t('createPost')}
                       </Link>
                     </Button>
                   ) : (
                     <div className="flex gap-2">
                       <Button asChild variant="ghost" className="flex-1" onClick={() => setMobileNavOpen(false)}>
-                        <Link href="/login">Log in</Link>
+                        <Link href="/login">{t('login')}</Link>
                       </Button>
                       <Button asChild className="flex-1" onClick={() => setMobileNavOpen(false)}>
-                        <Link href="/login">Sign up</Link>
+                        <Link href="/login">{t('signup')}</Link>
                       </Button>
                     </div>
                   )}
@@ -122,17 +125,17 @@ export function MainNav() {
             <div className="hidden lg:flex items-center gap-4">
               {visibleLinks.map((link) => (
                 <Link
-                  key={link.href}
+                  key={link.key || link.href}
                   href={link.href}
                   className={cn(
                     'text-sm font-medium transition-colors',
                     pathname === link.href ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
                   )}
                 >
-                  {link.label === 'Trending' ? (
+                  {link.key === 'trending' ? (
                     <span className="flex items-center gap-1">
                       <TrendingUp className="h-4 w-4" />
-                      Trending
+                      {link.label}
                     </span>
                   ) : (
                     link.label
@@ -148,7 +151,7 @@ export function MainNav() {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 type="search"
-                placeholder="Search posts, topics..."
+                placeholder={t('searchPlaceholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"
@@ -163,12 +166,13 @@ export function MainNav() {
                 <Button asChild size="sm" className="hidden sm:flex">
                   <Link href="/create">
                     <Plus className="h-4 w-4 mr-1" />
-                    Create
+                    {t('create')}
                   </Link>
                 </Button>
                 <DraftsTray />
                 {user && <FollowSuggestionsTray />}
                 <NotificationBell />
+                <LanguageSelector />
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="relative h-10 w-10 rounded-full">
@@ -189,42 +193,43 @@ export function MainNav() {
                     <DropdownMenuItem asChild>
                       <Link href={user.id ? `/u/${user.id}` : '#'}>
                         <User className="mr-2 h-4 w-4" />
-                        Profile
+                        {t('profile')}
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link href="/saved">
                         <Bookmark className="mr-2 h-4 w-4" />
-                        Saved Posts
+                        {t('savedPosts')}
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link href="/drafts">
                         <FileText className="mr-2 h-4 w-4" />
-                        Drafts
+                        {t('drafts')}
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link href="/settings">
                         <Settings className="mr-2 h-4 w-4" />
-                        Settings
+                        {t('settings')}
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={logout}>
                       <LogOut className="mr-2 h-4 w-4" />
-                      Log out
+                      {t('logout')}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </>
             ) : (
               <>
+                <LanguageSelector />
                 <Button asChild variant="ghost" size="sm">
-                  <Link href="/login">Log in</Link>
+                  <Link href="/login">{t('login')}</Link>
                 </Button>
                 <Button asChild size="sm">
-                  <Link href="/login">Sign up</Link>
+                  <Link href="/login">{t('signup')}</Link>
                 </Button>
               </>
             )}

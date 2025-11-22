@@ -1,0 +1,51 @@
+{
+  "nav": {
+    "home": "الرئيسية",
+    "feed": "المشاركات",
+    "trending": "الرائج",
+    "topics": "المواضيع",
+    "search": "بحث",
+    "saved": "المحفوظات",
+    "drafts": "المسودات",
+    "notifications": "الإشعارات",
+    "create": "إنشاء",
+    "createPost": "إنشاء منشور",
+    "profile": "الملف الشخصي",
+    "savedPosts": "المنشورات المحفوظة",
+    "settings": "الإعدادات",
+    "logout": "تسجيل الخروج",
+    "login": "تسجيل الدخول",
+    "signup": "إنشاء حساب",
+    "searchPlaceholder": "البحث عن منشورات، مواضيع...",
+    "navigateTitle": "التنقل في ConspiracyHub",
+    "navigateDescription": "الانتقال إلى المشاركات، المسودات، الإشعارات والمواضيع."
+  },
+  "common": {
+    "loading": "جاري التحميل...",
+    "error": "خطأ",
+    "success": "نجاح",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "close": "إغلاق",
+    "submit": "إرسال",
+    "confirm": "تأكيد"
+  },
+  "language": {
+    "select": "اختر اللغة",
+    "english": "الإنجليزية",
+    "spanish": "الإسبانية",
+    "french": "الفرنسية",
+    "german": "الألمانية",
+    "italian": "الإيطالية",
+    "portuguese": "البرتغالية",
+    "russian": "الروسية",
+    "chinese": "الصينية",
+    "japanese": "اليابانية",
+    "arabic": "العربية",
+    "hindi": "الهندية",
+    "korean": "الكورية"
+  }
+}
+

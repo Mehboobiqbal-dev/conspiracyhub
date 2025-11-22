@@ -1,0 +1,51 @@
+{
+  "nav": {
+    "home": "ホーム",
+    "feed": "フィード",
+    "trending": "トレンド",
+    "topics": "トピック",
+    "search": "検索",
+    "saved": "保存済み",
+    "drafts": "下書き",
+    "notifications": "通知",
+    "create": "作成",
+    "createPost": "投稿を作成",
+    "profile": "プロフィール",
+    "savedPosts": "保存した投稿",
+    "settings": "設定",
+    "logout": "ログアウト",
+    "login": "ログイン",
+    "signup": "サインアップ",
+    "searchPlaceholder": "投稿、トピックを検索...",
+    "navigateTitle": "ConspiracyHubをナビゲート",
+    "navigateDescription": "フィード、下書き、通知、トピックに移動します。"
+  },
+  "common": {
+    "loading": "読み込み中...",
+    "error": "エラー",
+    "success": "成功",
+    "save": "保存",
+    "cancel": "キャンセル",
+    "delete": "削除",
+    "edit": "編集",
+    "close": "閉じる",
+    "submit": "送信",
+    "confirm": "確認"
+  },
+  "language": {
+    "select": "言語を選択",
+    "english": "英語",
+    "spanish": "スペイン語",
+    "french": "フランス語",
+    "german": "ドイツ語",
+    "italian": "イタリア語",
+    "portuguese": "ポルトガル語",
+    "russian": "ロシア語",
+    "chinese": "中国語",
+    "japanese": "日本語",
+    "arabic": "アラビア語",
+    "hindi": "ヒンディー語",
+    "korean": "韓国語"
+  }
+}
+

@@ -19,24 +19,48 @@ interface PageProps {
   params: Promise<{ id: string }>;
 }
 
+// Helper function: sanitize HTML but keep <p>, <br>, <img>
+function sanitizeHtml(html: string): string {
+  if (typeof html !== 'string') return '';
+  // Remove all tags except <p>, <br>, <img>
+  return html.replace(/<(?!\/?(p|br|img)(?=>|\s.*>))\/?.*?>/g, '').trim();
+}
+
+// Limit string length but preserve HTML tags
+function truncateHtml(html: string, maxLength: number): string {
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = html;
+  let text = '';
+  const traverse = (node: ChildNode) => {
+    if (text.length >= maxLength) return;
+    if (node.nodeType === Node.TEXT_NODE) {
+      text += node.textContent?.slice(0, maxLength - text.length) || '';
+    } else if (node.nodeType === Node.ELEMENT_NODE) {
+      const el = node as HTMLElement;
+      if (el.tagName === 'IMG') {
+        text += el.outerHTML;
+      } else {
+        el.childNodes.forEach(traverse);
+      }
+    }
+  };
+  tempDiv.childNodes.forEach(traverse);
+  return text;
+}
+
 async function getUserProfile(userId: string) {
   try {
-    // Validate userId before creating ObjectId
-    if (!userId || userId === 'undefined' || !ObjectId.isValid(userId)) {
-      console.error('Invalid userId:', userId);
-      return null;
-    }
+    if (!userId || userId === 'undefined' || !ObjectId.isValid(userId)) return null;
 
     const usersCollection = await getCollection<User>('users');
     const user = await usersCollection.findOne({ _id: new ObjectId(userId) });
-
     if (!user) return null;
 
     const postsCollection = await getCollection<Post>('posts');
     const commentsCollection = await getCollection('comments');
     const followsCollection = await getCollection<UserFollow>('user_follows');
     const statsCollection = await getCollection<UserStats>('user_stats');
-    
+
     const posts = await postsCollection
       .find({ authorId: user._id, status: 'published' })
       .sort({ createdAt: -1 })
@@ -44,10 +68,8 @@ async function getUserProfile(userId: string) {
       .toArray();
 
     const comments = await commentsCollection.countDocuments({ authorId: user._id });
-
     const followerCount = await followsCollection.countDocuments({ followingId: user._id });
     const followingCount = await followsCollection.countDocuments({ followerId: user._id });
-
     const userStats = await statsCollection.findOne({ userId: user._id });
     const karma = userStats?.karma || 0;
 
@@ -82,67 +104,40 @@ async function getUserProfile(userId: string) {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params;
-  
-  if (!id || id === 'undefined') {
-    return {
-      title: 'User Not Found',
-    };
-  }
-  
+  if (!id || id === 'undefined') return { title: 'User Not Found' };
   const data = await getUserProfile(id);
-  
-  if (!data) {
-    return {
-      title: 'User Not Found',
-    };
-  }
-
-  const { user } = data;
-  
-  return {
-    title: `${user.name} | ConspiracyHub`,
-    description: user.bio || `Posts by ${user.name}`,
-  };
+  if (!data) return { title: 'User Not Found' };
+  return { title: `${data.user.name} | ConspiracyHub`, description: data.user.bio || `Posts by ${data.user.name}` };
 }
 
 export default async function UserProfilePage({ params }: PageProps) {
   const { id } = await params;
-  
-  if (!id || id === 'undefined') {
-    notFound();
-  }
-  
-  const data = await getUserProfile(id);
+  if (!id || id === 'undefined') notFound();
 
-  if (!data) {
-    notFound();
-  }
+  const data = await getUserProfile(id);
+  if (!data) notFound();
 
   const { user, posts, stats } = data;
 
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8 max-w-6xl">
+        {/* User Card */}
         <Card className="mb-8">
           <CardHeader>
             <div className="flex items-start gap-6">
               <Avatar className="h-24 w-24">
                 <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="text-2xl">
-                  {user.name.charAt(0).toUpperCase()}
-                </AvatarFallback>
+                <AvatarFallback className="text-2xl">{user.name.charAt(0).toUpperCase()}</AvatarFallback>
               </Avatar>
               <div className="flex-1">
                 <div className="flex items-start justify-between mb-2">
                   <CardTitle className="text-3xl">{user.name}</CardTitle>
                   <UserFollowButton userId={user._id} />
                 </div>
-                {user.bio && (
-                  <CardDescription className="text-base mt-2">
-                    {user.bio}
-                  </CardDescription>
-                )}
+                {user.bio && <CardDescription className="text-base mt-2">{user.bio}</CardDescription>}
                 <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mt-6">
+                  {/* Stats */}
                   <div className="flex items-center gap-2">
                     <Trophy className="h-5 w-5 text-primary" />
                     <div>
@@ -191,6 +186,7 @@ export default async function UserProfilePage({ params }: PageProps) {
           </CardHeader>
         </Card>
 
+        {/* User Posts */}
         <div>
           <h2 className="text-2xl font-semibold mb-4">Posts</h2>
           {posts.length === 0 ? (
@@ -210,9 +206,7 @@ export default async function UserProfilePage({ params }: PageProps) {
                           <Badge variant={post.type === 'conspiracy' ? 'destructive' : 'default'}>
                             {post.type}
                           </Badge>
-                          {post.isAIGenerated && (
-                            <Badge variant="secondary">AI Generated</Badge>
-                          )}
+                          {post.isAIGenerated && <Badge variant="secondary">AI Generated</Badge>}
                           {post.topicSlug && (
                             <Link href={`/t/${post.topicSlug}`}>
                               <Badge variant="outline">{post.topicSlug}</Badge>
@@ -220,14 +214,15 @@ export default async function UserProfilePage({ params }: PageProps) {
                           )}
                         </div>
                         <Link href={`/p/${post.slug}`}>
-                          <CardTitle className="text-2xl hover:text-primary transition-colors cursor-pointer">
-                            {post.title}
-                          </CardTitle>
+                          <CardTitle className="text-2xl hover:text-primary transition-colors cursor-pointer">{post.title}</CardTitle>
                         </Link>
-                        {post.excerpt && (
-                          <CardDescription className="mt-2 line-clamp-2">
-                            {post.excerpt}
-                          </CardDescription>
+                        {(post.excerpt || post.content) && (
+                          <CardDescription
+                            className="mt-2 line-clamp-3"
+                            dangerouslySetInnerHTML={{
+                              __html: truncateHtml(sanitizeHtml(post.excerpt || post.content || ''), 300),
+                            }}
+                          />
                         )}
                       </div>
                     </div>
@@ -261,4 +256,3 @@ export default async function UserProfilePage({ params }: PageProps) {
     </div>
   );
 }
-

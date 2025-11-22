@@ -1,0 +1,51 @@
+{
+  "nav": {
+    "home": "首页",
+    "feed": "动态",
+    "trending": "热门",
+    "topics": "话题",
+    "search": "搜索",
+    "saved": "已保存",
+    "drafts": "草稿",
+    "notifications": "通知",
+    "create": "创建",
+    "createPost": "创建帖子",
+    "profile": "个人资料",
+    "savedPosts": "已保存的帖子",
+    "settings": "设置",
+    "logout": "退出",
+    "login": "登录",
+    "signup": "注册",
+    "searchPlaceholder": "搜索帖子、话题...",
+    "navigateTitle": "导航 ConspiracyHub",
+    "navigateDescription": "跳转到动态、草稿、通知和话题。"
+  },
+  "common": {
+    "loading": "加载中...",
+    "error": "错误",
+    "success": "成功",
+    "save": "保存",
+    "cancel": "取消",
+    "delete": "删除",
+    "edit": "编辑",
+    "close": "关闭",
+    "submit": "提交",
+    "confirm": "确认"
+  },
+  "language": {
+    "select": "选择语言",
+    "english": "英语",
+    "spanish": "西班牙语",
+    "french": "法语",
+    "german": "德语",
+    "italian": "意大利语",
+    "portuguese": "葡萄牙语",
+    "russian": "俄语",
+    "chinese": "中文",
+    "japanese": "日语",
+    "arabic": "阿拉伯语",
+    "hindi": "印地语",
+    "korean": "韩语"
+  }
+}
+

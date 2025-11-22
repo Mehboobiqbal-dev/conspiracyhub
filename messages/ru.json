@@ -1,0 +1,51 @@
+{
+  "nav": {
+    "home": "Главная",
+    "feed": "Лента",
+    "trending": "В тренде",
+    "topics": "Темы",
+    "search": "Поиск",
+    "saved": "Сохранено",
+    "drafts": "Черновики",
+    "notifications": "Уведомления",
+    "create": "Создать",
+    "createPost": "Создать пост",
+    "profile": "Профиль",
+    "savedPosts": "Сохраненные посты",
+    "settings": "Настройки",
+    "logout": "Выйти",
+    "login": "Войти",
+    "signup": "Регистрация",
+    "searchPlaceholder": "Поиск постов, тем...",
+    "navigateTitle": "Навигация ConspiracyHub",
+    "navigateDescription": "Перейти к лентам, черновикам, уведомлениям и темам."
+  },
+  "common": {
+    "loading": "Загрузка...",
+    "error": "Ошибка",
+    "success": "Успех",
+    "save": "Сохранить",
+    "cancel": "Отмена",
+    "delete": "Удалить",
+    "edit": "Редактировать",
+    "close": "Закрыть",
+    "submit": "Отправить",
+    "confirm": "Подтвердить"
+  },
+  "language": {
+    "select": "Выбрать язык",
+    "english": "Английский",
+    "spanish": "Испанский",
+    "french": "Французский",
+    "german": "Немецкий",
+    "italian": "Итальянский",
+    "portuguese": "Португальский",
+    "russian": "Русский",
+    "chinese": "Китайский",
+    "japanese": "Японский",
+    "arabic": "Арабский",
+    "hindi": "Хинди",
+    "korean": "Корейский"
+  }
+}
+

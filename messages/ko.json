@@ -1,0 +1,51 @@
+{
+  "nav": {
+    "home": "홈",
+    "feed": "피드",
+    "trending": "트렌딩",
+    "topics": "주제",
+    "search": "검색",
+    "saved": "저장됨",
+    "drafts": "초안",
+    "notifications": "알림",
+    "create": "만들기",
+    "createPost": "게시물 만들기",
+    "profile": "프로필",
+    "savedPosts": "저장된 게시물",
+    "settings": "설정",
+    "logout": "로그아웃",
+    "login": "로그인",
+    "signup": "가입하기",
+    "searchPlaceholder": "게시물, 주제 검색...",
+    "navigateTitle": "ConspiracyHub 탐색",
+    "navigateDescription": "피드, 초안, 알림 및 주제로 이동합니다."
+  },
+  "common": {
+    "loading": "로딩 중...",
+    "error": "오류",
+    "success": "성공",
+    "save": "저장",
+    "cancel": "취소",
+    "delete": "삭제",
+    "edit": "편집",
+    "close": "닫기",
+    "submit": "제출",
+    "confirm": "확인"
+  },
+  "language": {
+    "select": "언어 선택",
+    "english": "영어",
+    "spanish": "스페인어",
+    "french": "프랑스어",
+    "german": "독일어",
+    "italian": "이탈리아어",
+    "portuguese": "포르투갈어",
+    "russian": "러시아어",
+    "chinese": "중국어",
+    "japanese": "일본어",
+    "arabic": "아랍어",
+    "hindi": "힌디어",
+    "korean": "한국어"
+  }
+}
+

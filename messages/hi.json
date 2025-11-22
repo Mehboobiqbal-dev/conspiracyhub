@@ -1,0 +1,51 @@
+{
+  "nav": {
+    "home": "होम",
+    "feed": "फ़ीड",
+    "trending": "ट्रेंडिंग",
+    "topics": "विषय",
+    "search": "खोजें",
+    "saved": "सहेजे गए",
+    "drafts": "ड्राफ्ट",
+    "notifications": "सूचनाएं",
+    "create": "बनाएं",
+    "createPost": "पोस्ट बनाएं",
+    "profile": "प्रोफ़ाइल",
+    "savedPosts": "सहेजे गए पोस्ट",
+    "settings": "सेटिंग्स",
+    "logout": "लॉग आउट",
+    "login": "लॉग इन",
+    "signup": "साइन अप",
+    "searchPlaceholder": "पोस्ट, विषय खोजें...",
+    "navigateTitle": "ConspiracyHub नेविगेट करें",
+    "navigateDescription": "फ़ीड, ड्राफ्ट, सूचनाएं और विषयों पर जाएं।"
+  },
+  "common": {
+    "loading": "लोड हो रहा है...",
+    "error": "त्रुटि",
+    "success": "सफल",
+    "save": "सहेजें",
+    "cancel": "रद्द करें",
+    "delete": "हटाएं",
+    "edit": "संपादित करें",
+    "close": "बंद करें",
+    "submit": "सबमिट करें",
+    "confirm": "पुष्टि करें"
+  },
+  "language": {
+    "select": "भाषा चुनें",
+    "english": "अंग्रेजी",
+    "spanish": "स्पेनिश",
+    "french": "फ्रेंच",
+    "german": "जर्मन",
+    "italian": "इतालवी",
+    "portuguese": "पुर्तगाली",
+    "russian": "रूसी",
+    "chinese": "चीनी",
+    "japanese": "जापानी",
+    "arabic": "अरबी",
+    "hindi": "हिंदी",
+    "korean": "कोरियाई"
+  }
+}
+

@@ -1,0 +1,51 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "feed": "Fil",
+    "trending": "Tendances",
+    "topics": "Sujets",
+    "search": "Rechercher",
+    "saved": "Enregistrés",
+    "drafts": "Brouillons",
+    "notifications": "Notifications",
+    "create": "Créer",
+    "createPost": "Créer une publication",
+    "profile": "Profil",
+    "savedPosts": "Publications enregistrées",
+    "settings": "Paramètres",
+    "logout": "Déconnexion",
+    "login": "Connexion",
+    "signup": "S'inscrire",
+    "searchPlaceholder": "Rechercher des publications, sujets...",
+    "navigateTitle": "Naviguer dans ConspiracyHub",
+    "navigateDescription": "Accéder aux fils, brouillons, notifications et sujets."
+  },
+  "common": {
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succès",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "close": "Fermer",
+    "submit": "Soumettre",
+    "confirm": "Confirmer"
+  },
+  "language": {
+    "select": "Sélectionner la langue",
+    "english": "Anglais",
+    "spanish": "Espagnol",
+    "french": "Français",
+    "german": "Allemand",
+    "italian": "Italien",
+    "portuguese": "Portugais",
+    "russian": "Russe",
+    "chinese": "Chinois",
+    "japanese": "Japonais",
+    "arabic": "Arabe",
+    "hindi": "Hindi",
+    "korean": "Coréen"
+  }
+}
+

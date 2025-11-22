@@ -1,0 +1,51 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "feed": "Feed",
+    "trending": "Tendencias",
+    "topics": "Temas",
+    "search": "Buscar",
+    "saved": "Guardados",
+    "drafts": "Borradores",
+    "notifications": "Notificaciones",
+    "create": "Crear",
+    "createPost": "Crear publicación",
+    "profile": "Perfil",
+    "savedPosts": "Publicaciones guardadas",
+    "settings": "Configuración",
+    "logout": "Cerrar sesión",
+    "login": "Iniciar sesión",
+    "signup": "Registrarse",
+    "searchPlaceholder": "Buscar publicaciones, temas...",
+    "navigateTitle": "Navegar ConspiracyHub",
+    "navigateDescription": "Ir a feeds, borradores, notificaciones y temas."
+  },
+  "common": {
+    "loading": "Cargando...",
+    "error": "Error",
+    "success": "Éxito",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "close": "Cerrar",
+    "submit": "Enviar",
+    "confirm": "Confirmar"
+  },
+  "language": {
+    "select": "Seleccionar idioma",
+    "english": "Inglés",
+    "spanish": "Español",
+    "french": "Francés",
+    "german": "Alemán",
+    "italian": "Italiano",
+    "portuguese": "Portugués",
+    "russian": "Ruso",
+    "chinese": "Chino",
+    "japanese": "Japonés",
+    "arabic": "Árabe",
+    "hindi": "Hindi",
+    "korean": "Coreano"
+  }
+}
+

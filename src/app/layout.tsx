@@ -3,6 +3,8 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster"
 import { cn } from '@/lib/utils';
 import { AuthProvider } from '@/contexts/auth-context';
+import { LocaleProvider } from '@/contexts/locale-context';
+import { NextIntlProviderWrapper } from '@/components/next-intl-provider';
 import { MainNav } from '@/components/main-nav';
 import { ReduxProvider } from '@/store/provider';
 
@@ -33,11 +35,15 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={cn("antialiased")}>
         <ReduxProvider>
-          <AuthProvider>
-            <MainNav />
-            <main>{children}</main>
-            <Toaster />
-          </AuthProvider>
+          <LocaleProvider>
+            <NextIntlProviderWrapper>
+              <AuthProvider>
+                <MainNav />
+                <main>{children}</main>
+                <Toaster />
+              </AuthProvider>
+            </NextIntlProviderWrapper>
+          </LocaleProvider>
         </ReduxProvider>
       </body>
     </html>
