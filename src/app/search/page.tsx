@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowUp, MessageCircle, Eye, Clock } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { getTextPreview } from '@/lib/utils/html';
 
 type SearchType = 'all' | 'posts' | 'topics';
 
@@ -348,9 +349,9 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                                 {post.title}
                               </CardTitle>
                             </Link>
-                            {post.excerpt && (
+                            {(post.excerpt || post.content) && (
                               <CardDescription className="mt-2 line-clamp-2">
-                                {post.excerpt}
+                                {getTextPreview(post.excerpt || post.content || '', 200)}
                               </CardDescription>
                             )}
                           </div>

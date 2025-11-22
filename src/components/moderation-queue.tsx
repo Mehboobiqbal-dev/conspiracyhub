@@ -9,6 +9,7 @@ import { Loader2, CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
+import { getTextPreview } from '@/lib/utils/html';
 
 interface ModerationItem {
   _id: string;
@@ -123,7 +124,7 @@ export function ModerationQueue() {
                         <CardTitle className="mb-2">{item.item.title}</CardTitle>
                       )}
                       <CardDescription>
-                        <p className="line-clamp-2">{item.item.content}</p>
+                        <p className="line-clamp-2">{getTextPreview(item.item.content || '', 200)}</p>
                         <p className="text-xs mt-2">
                           By {item.item.authorName || 'Unknown'} •{' '}
                           {formatDistanceToNow(new Date(item.item.createdAt), { addSuffix: true })}

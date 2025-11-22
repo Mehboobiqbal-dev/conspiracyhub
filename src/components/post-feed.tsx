@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowUp, MessageCircle, Eye, Clock, Loader2 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { getTextPreview } from '@/lib/utils/html';
 
 interface Post {
   _id: string;
@@ -199,9 +200,9 @@ export function PostFeed({ initialPosts, feedType = 'public', topicSlug }: PostF
                         {post.title}
                       </CardTitle>
                     </Link>
-                    {post.excerpt && (
+                    {(post.excerpt || post.content) && (
                       <CardDescription className="mt-2 line-clamp-2">
-                        {post.excerpt}
+                        {getTextPreview(post.excerpt || post.content || '', 200)}
                       </CardDescription>
                     )}
                   </div>

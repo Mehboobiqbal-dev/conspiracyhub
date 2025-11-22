@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { ArrowUp, MessageCircle, Eye, Clock, TrendingUp } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { getTextPreview } from '@/lib/utils/html';
 
 export const metadata: Metadata = {
   title: 'Trending Posts | ConspiracyHub',
@@ -111,9 +112,9 @@ export default async function TrendingPage() {
                           {post.title}
                         </CardTitle>
                       </Link>
-                      {post.excerpt && (
+                      {(post.excerpt || post.content) && (
                         <CardDescription className="mt-2 line-clamp-2">
-                          {post.excerpt}
+                          {getTextPreview(post.excerpt || post.content || '', 200)}
                         </CardDescription>
                       )}
                     </div>

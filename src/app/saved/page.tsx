@@ -9,10 +9,12 @@ import { Badge } from '@/components/ui/badge';
 import { ArrowUp, MessageCircle, Eye, Clock, Bookmark } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { Loader2 } from 'lucide-react';
+import { getTextPreview } from '@/lib/utils/html';
 
 interface Post {
   _id: string;
   title: string;
+  content?: string;
   type: 'conspiracy' | 'opinion';
   topicSlug?: string;
   authorName?: string;
@@ -117,9 +119,9 @@ export default function SavedPostsPage() {
                           {post.title}
                         </CardTitle>
                       </Link>
-                      {post.excerpt && (
+                      {(post.excerpt || post.content) && (
                         <CardDescription className="mt-2 line-clamp-2">
-                          {post.excerpt}
+                          {getTextPreview(post.excerpt || post.content || '', 200)}
                         </CardDescription>
                       )}
                     </div>
