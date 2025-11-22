@@ -43,9 +43,7 @@ async function getUserProfile(userId: string) {
       .limit(20)
       .toArray();
 
-    const comments = await commentsCollection
-      .find({ authorId: user._id })
-      .count();
+    const comments = await commentsCollection.countDocuments({ authorId: user._id });
 
     const followerCount = await followsCollection.countDocuments({ followingId: user._id });
     const followingCount = await followsCollection.countDocuments({ followerId: user._id });
