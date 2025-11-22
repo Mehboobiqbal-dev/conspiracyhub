@@ -1,12 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/middleware/auth';
+import type { AuthenticatedRequest } from '@/lib/middleware/auth';
 import { getCollection } from '@/lib/db/mongodb';
 import { Draft } from '@/lib/models/draft';
 import { ObjectId } from 'mongodb';
 
 async function handler(request: NextRequest) {
   try {
-    const userId = (request as any).user.userId;
+    const { user } = request as AuthenticatedRequest;
+    const userId = user?.userId;
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
     const draftsCollection = await getCollection<Draft>('drafts');
 
     const drafts = await draftsCollection

@@ -13,7 +13,6 @@ import { Badge } from '@/components/ui/badge';
 import { formatDistanceToNow } from 'date-fns';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/auth-context';
-import { useRouter } from 'next/navigation';
 
 interface Notification {
   _id: string;
@@ -30,7 +29,6 @@ export function NotificationBell() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(false);
   const { user } = useAuth();
-  const router = useRouter();
 
   useEffect(() => {
     if (user) {

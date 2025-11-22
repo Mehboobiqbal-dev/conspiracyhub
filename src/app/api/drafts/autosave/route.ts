@@ -3,48 +3,53 @@ import { requireAuth } from '@/lib/middleware/auth';
 import type { AuthenticatedRequest } from '@/lib/middleware/auth';
 import { getCollection } from '@/lib/db/mongodb';
 import { Draft, DraftMedia } from '@/lib/models/draft';
-import { z } from 'zod';
 import { ObjectId } from 'mongodb';
+import { z } from 'zod';
 
-const createDraftSchema = z.object({
+const mediaSchema = z.object({
+  url: z.string().url(),
+  type: z.enum(['image', 'video']),
+  caption: z.string().optional(),
+  altText: z.string().optional(),
+  thumbnail: z.string().optional(),
+});
+
+const autosaveSchema = z.object({
+  draftId: z.string().optional(),
   title: z.string().optional(),
-  content: z.string(),
+  content: z.string().min(1),
   type: z.enum(['conspiracy', 'opinion']).optional(),
-  topicSlug: z.string().optional(),
+  topicSlug: z.string().optional().nullable(),
   tags: z.array(z.string()).optional(),
   excerpt: z.string().optional(),
   featuredImage: z.string().optional(),
-  media: z.array(
-    z.object({
-      url: z.string().url(),
-      type: z.enum(['image', 'video']),
-      caption: z.string().optional(),
-      altText: z.string().optional(),
-      thumbnail: z.string().optional(),
-    })
-  ).optional(),
+  media: z.array(mediaSchema).optional(),
   status: z.enum(['draft', 'scheduled']).optional(),
   scheduledFor: z.string().datetime().optional(),
   visibility: z.enum(['public', 'private']).optional(),
 });
 
+function getWordCount(html: string) {
+  const text = html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  if (!text) return 0;
+  return text.split(' ').length;
+}
+
 async function handler(request: NextRequest) {
   try {
+    const body = await request.json();
+    const validated = autosaveSchema.parse(body);
     const { user } = request as AuthenticatedRequest;
     const userId = user?.userId;
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-    const body = await request.json();
-    const validated = createDraftSchema.parse(body);
-
     const draftsCollection = await getCollection<Draft>('drafts');
-    const authorObjectId = new ObjectId(userId);
     const now = new Date();
-    
-    const draft: Omit<Draft, '_id'> = {
-      authorId: authorObjectId,
-      title: validated.title || '',
+    const authorObjectId = new ObjectId(userId);
+
+    const updatePayload: Partial<Draft> = {
+      title: validated.title ?? '',
       content: validated.content,
       type: validated.type || 'conspiracy',
       topicSlug: validated.topicSlug || undefined,
@@ -52,23 +57,32 @@ async function handler(request: NextRequest) {
       excerpt: validated.excerpt,
       featuredImage: validated.featuredImage,
       media: (validated.media as DraftMedia[]) || [],
-      createdAt: now,
-      updatedAt: now,
-      autosavedAt: now,
       status: validated.status || 'draft',
       scheduledFor: validated.scheduledFor ? new Date(validated.scheduledFor) : undefined,
-      wordCount: validated.content.replace(/<[^>]+>/g, ' ').trim().split(/\s+/).filter(Boolean).length,
+      autosavedAt: now,
+      updatedAt: now,
+      wordCount: getWordCount(validated.content),
       visibility: validated.visibility || 'public',
     };
 
-    const result = await draftsCollection.insertOne(draft as Draft);
+    const { draftId } = validated;
+    if (draftId) {
+      const draftObjectId = new ObjectId(draftId);
+      await draftsCollection.updateOne(
+        { _id: draftObjectId, authorId: authorObjectId },
+        { $set: updatePayload, $setOnInsert: { createdAt: now, authorId: authorObjectId } },
+        { upsert: true }
+      );
+      return NextResponse.json({ draftId });
+    }
 
-    return NextResponse.json({
-      draft: {
-        ...draft,
-        _id: result.insertedId.toString(),
-      },
-    }, { status: 201 });
+    const result = await draftsCollection.insertOne({
+      ...updatePayload,
+      authorId: authorObjectId,
+      createdAt: now,
+    } as Draft);
+
+    return NextResponse.json({ draftId: result.insertedId.toString() }, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -77,13 +91,14 @@ async function handler(request: NextRequest) {
       );
     }
 
-    console.error('Error creating draft:', error);
+    console.error('Autosave draft error:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Failed to autosave draft' },
       { status: 500 }
     );
   }
 }
 
 export const POST = requireAuth(handler);
+
 

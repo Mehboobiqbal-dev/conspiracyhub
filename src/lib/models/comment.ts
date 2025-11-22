@@ -1,5 +1,13 @@
 import { ObjectId } from 'mongodb';
 
+export interface CommentAttachment {
+  url: string;
+  type: 'image' | 'video';
+  altText?: string;
+  caption?: string;
+  thumbnail?: string;
+}
+
 export interface Comment {
   _id?: ObjectId;
   postId: ObjectId;
@@ -7,6 +15,7 @@ export interface Comment {
   authorName?: string; // Denormalized
   authorAvatar?: string; // Denormalized
   content: string;
+  attachment?: CommentAttachment;
   parentId?: ObjectId; // For nested comments (replies)
   upvotes: number;
   downvotes: number;

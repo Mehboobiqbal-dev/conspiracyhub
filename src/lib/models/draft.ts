@@ -6,6 +6,8 @@ export interface DraftMedia {
   url: string;
   type: 'image' | 'video';
   caption?: string;
+  altText?: string;
+  thumbnail?: string;
 }
 
 export interface Draft {
@@ -20,9 +22,13 @@ export interface Draft {
   excerpt?: string;
   featuredImage?: string;
   media?: DraftMedia[];
+  visibility?: 'public' | 'private';
   createdAt: Date;
   updatedAt: Date;
-  status: 'draft';
+  status: 'draft' | 'scheduled';
+  autosavedAt?: Date;
+  scheduledFor?: Date;
+  wordCount?: number;
 }
 
 export interface DraftSummary {

@@ -1,22 +1,39 @@
 'use client';
 
-import { useState, useMemo, useEffect, useCallback, Suspense } from 'react';
+import { useState, useMemo, useEffect, useCallback, useRef, Suspense } from 'react';
 import dynamic from 'next/dynamic';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Image from 'next/image';
 import { useAuth } from '@/contexts/auth-context';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { Switch } from '@/components/ui/switch';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 import { AIAssistButton } from '@/components/ai-assist-button';
-import { cn } from '@/lib/utils';
+import { formatDistanceToNow } from 'date-fns';
 
 const RichEditor = dynamic(() => import('@/components/rich-editor').then((mod) => mod.RichEditor), {
   ssr: false,
 });
+
+interface DraftMedia {
+  url: string;
+  type: 'image' | 'video';
+  caption?: string;
+  altText?: string;
+}
 
 interface DraftResponse {
   draft: {
@@ -26,6 +43,12 @@ interface DraftResponse {
     type: 'conspiracy' | 'opinion';
     topicSlug?: string;
     tags: string[];
+    excerpt?: string;
+    featuredImage?: string;
+    media?: DraftMedia[];
+    status?: 'draft' | 'scheduled';
+    scheduledFor?: string;
+    visibility?: 'public' | 'private';
   };
 }
 
@@ -35,6 +58,15 @@ function CreatePostPageContent() {
   const [type, setType] = useState<'conspiracy' | 'opinion'>('conspiracy');
   const [topicSlug, setTopicSlug] = useState('');
   const [tags, setTags] = useState('');
+  const [featuredImage, setFeaturedImage] = useState('');
+  const [excerpt, setExcerpt] = useState('');
+  const [visibility, setVisibility] = useState<'public' | 'private'>('public');
+  const [scheduleEnabled, setScheduleEnabled] = useState(false);
+  const [scheduledAt, setScheduledAt] = useState('');
+  const [mediaAssets, setMediaAssets] = useState<DraftMedia[]>([]);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [lastAutosave, setLastAutosave] = useState<Date | null>(null);
+  const [dirty, setDirty] = useState(false);
   const [loading, setLoading] = useState(false);
   const [savingDraft, setSavingDraft] = useState(false);
   const [draftId, setDraftId] = useState<string | null>(null);
@@ -45,6 +77,7 @@ function CreatePostPageContent() {
   const { user, loading: authLoading } = useAuth();
   const { toast } = useToast();
   const searchParams = useSearchParams();
+  const hasInitializedRef = useRef(false);
 
   useEffect(() => {
     // Fetch topics
@@ -54,16 +87,7 @@ function CreatePostPageContent() {
       .catch(console.error);
   }, []);
 
-  useEffect(() => {
-    const draftParam = searchParams.get('draft');
-    if (draftParam) {
-      loadDraft(draftParam);
-    } else {
-      setInitializingDraft(false);
-    }
-  }, [searchParams]);
-
-  const loadDraft = async (id: string) => {
+  const loadDraft = useCallback(async (id: string) => {
     try {
       const response = await fetch(`/api/drafts/${id}`, {
         credentials: 'include',
@@ -76,25 +100,103 @@ function CreatePostPageContent() {
         setType(data.draft.type);
         setTopicSlug(data.draft.topicSlug || '');
         setTags(data.draft.tags.join(', '));
+        setExcerpt(data.draft.excerpt || '');
+        setFeaturedImage(data.draft.featuredImage || '');
+        setMediaAssets(data.draft.media || []);
+        setVisibility(data.draft.visibility || 'public');
+        setScheduleEnabled(data.draft.status === 'scheduled');
+        setScheduledAt(
+          data.draft.scheduledFor ? new Date(data.draft.scheduledFor).toISOString().slice(0, 16) : ''
+        );
       } else {
         throw new Error('Failed to load draft');
       }
-    } catch (error: any) {
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to load draft';
       toast({
         title: 'Error loading draft',
-        description: error.message || 'Failed to load draft',
+        description: message,
         variant: 'destructive',
       });
     } finally {
       setInitializingDraft(false);
     }
-  };
+  }, [toast]);
+
+  useEffect(() => {
+    const draftParam = searchParams.get('draft');
+    if (draftParam) {
+      loadDraft(draftParam);
+    } else {
+      setInitializingDraft(false);
+    }
+  }, [searchParams, loadDraft]);
 
   useEffect(() => {
     if (!authLoading && !user) {
       router.push('/login?redirect=/create');
     }
   }, [user, authLoading, router]);
+
+  useEffect(() => {
+    if (initializingDraft) return;
+    if (!hasInitializedRef.current) {
+      hasInitializedRef.current = true;
+      return;
+    }
+    setDirty(true);
+  }, [title, content, type, topicSlug, tags, featuredImage, excerpt, visibility, scheduleEnabled, scheduledAt, mediaAssets, initializingDraft]);
+
+  useEffect(() => {
+    const handler = (event: BeforeUnloadEvent) => {
+      if (!dirty) return;
+      event.preventDefault();
+      event.returnValue = '';
+    };
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
+  }, [dirty]);
+
+  const handleAutosave = useCallback(async (editorContent: string) => {
+    if (!user || !editorContent.trim()) return;
+
+    try {
+      const response = await fetch('/api/drafts/autosave', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          draftId,
+          title,
+          content: editorContent,
+          type,
+          topicSlug: topicSlug || undefined,
+          tags: tags.split(',').map(t => t.trim()).filter(Boolean),
+          excerpt: excerpt || undefined,
+          featuredImage: featuredImage || undefined,
+          media: mediaAssets,
+          status: scheduleEnabled ? 'scheduled' : 'draft',
+          scheduledFor: scheduleEnabled && scheduledAt ? new Date(scheduledAt).toISOString() : undefined,
+          visibility,
+        }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        if (!draftId && data.draftId) {
+          setDraftId(data.draftId);
+          router.replace(`/create?draft=${data.draftId}`);
+        }
+        setLastAutosave(new Date());
+      }
+    } catch (error) {
+      console.error('Autosave failed', error);
+    }
+  }, [draftId, excerpt, featuredImage, mediaAssets, router, scheduleEnabled, scheduledAt, tags, title, topicSlug, type, user, visibility]);
+
+  const handleMediaInsert = useCallback((asset: DraftMedia) => {
+    setMediaAssets((prev) => [asset, ...prev].slice(0, 10));
+  }, []);
 
   if (authLoading || initializingDraft) {
     return (
@@ -139,10 +241,31 @@ function CreatePostPageContent() {
       return;
     }
 
+    if (scheduleEnabled) {
+      if (!scheduledAt) {
+        toast({
+          title: 'Schedule time required',
+          description: 'Select a future time to schedule this post.',
+          variant: 'destructive',
+        });
+        return;
+      }
+      const scheduleDate = new Date(scheduledAt);
+      if (scheduleDate.getTime() < Date.now() + 60 * 1000) {
+        toast({
+          title: 'Schedule time invalid',
+          description: 'Pick a time at least 1 minute in the future.',
+          variant: 'destructive',
+        });
+        return;
+      }
+    }
+
     setLoading(true);
 
     try {
       const tagArray = tags.split(',').map(t => t.trim()).filter(t => t.length > 0);
+      const publishAt = scheduleEnabled && scheduledAt ? new Date(scheduledAt).toISOString() : undefined;
 
       const response = await fetch('/api/posts/create', {
         method: 'POST',
@@ -156,6 +279,11 @@ function CreatePostPageContent() {
           type,
           topicSlug: topicSlug || undefined,
           tags: tagArray,
+            excerpt: excerpt || undefined,
+            featuredImage: featuredImage || undefined,
+            media: mediaAssets,
+            publishAt,
+            visibility,
         }),
       });
 
@@ -170,11 +298,13 @@ function CreatePostPageContent() {
         description: 'Post created successfully!',
       });
 
+      setDirty(false);
       router.push(`/p/${data.post.slug}`);
-    } catch (error: any) {
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to create post';
       toast({
         title: 'Error',
-        description: error.message || 'Failed to create post',
+        description: message,
         variant: 'destructive',
       });
     } finally {
@@ -205,6 +335,12 @@ function CreatePostPageContent() {
         type,
         topicSlug: topicSlug || undefined,
         tags: tags.split(',').map(t => t.trim()).filter(Boolean),
+        excerpt: excerpt || undefined,
+        featuredImage: featuredImage || undefined,
+        media: mediaAssets,
+        status: scheduleEnabled ? 'scheduled' : 'draft',
+        scheduledFor: scheduleEnabled && scheduledAt ? new Date(scheduledAt).toISOString() : undefined,
+        visibility,
       };
 
       const response = await fetch(draftId ? `/api/drafts/${draftId}` : '/api/drafts', {
@@ -230,10 +366,12 @@ function CreatePostPageContent() {
         title: 'Draft saved',
         description: 'You can revisit this draft anytime from the Drafts page',
       });
-    } catch (error: any) {
+      setDirty(false);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to save draft';
       toast({
         title: 'Error',
-        description: error.message || 'Failed to save draft',
+        description: message,
         variant: 'destructive',
       });
     } finally {
@@ -293,8 +431,20 @@ function CreatePostPageContent() {
                   />
                 </div>
                 <div className="border rounded-lg">
-                  <RichEditor content={content} onChange={setContent} placeholder="Write your theory or opinion..." />
+                  <RichEditor
+                    content={content}
+                    onChange={setContent}
+                    placeholder="Write your theory or opinion..."
+                    enableAutosave
+                    onAutosave={handleAutosave}
+                    onMediaInsert={handleMediaInsert}
+                  />
                 </div>
+                {lastAutosave && (
+                  <p className="text-xs text-muted-foreground">
+                    Autosaved {formatDistanceToNow(lastAutosave, { addSuffix: true })}
+                  </p>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -333,6 +483,72 @@ function CreatePostPageContent() {
                 </p>
               </div>
 
+              <div className="space-y-2">
+                <Label htmlFor="featuredImage">Featured Image (Optional)</Label>
+                <Input
+                  id="featuredImage"
+                  value={featuredImage}
+                  onChange={(e) => setFeaturedImage(e.target.value)}
+                  placeholder="https://example.com/cover.jpg"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Displayed on previews, topic feeds, and social cards.
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="excerpt">SEO Excerpt</Label>
+                <Textarea
+                  id="excerpt"
+                  value={excerpt}
+                  onChange={(e) => setExcerpt(e.target.value)}
+                  placeholder="150-160 character summary shown on search and social previews"
+                  rows={3}
+                />
+                <p className="text-xs text-muted-foreground">
+                  {excerpt.length || 0} / 160 characters
+                </p>
+              </div>
+
+              <div className="space-y-4 border rounded-lg p-4">
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                  <div>
+                    <Label className="text-base">Visibility</Label>
+                    <p className="text-xs text-muted-foreground">
+                      Public posts are visible to everyone; private posts stay hidden until you share the link.
+                    </p>
+                  </div>
+                  <Select value={visibility} onValueChange={(value: 'public' | 'private') => setVisibility(value)}>
+                    <SelectTrigger className="w-[160px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="public">Public</SelectItem>
+                      <SelectItem value="private">Private</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="flex flex-wrap items-center justify-between gap-4 border-t pt-4">
+                  <div>
+                    <Label className="text-base">Schedule publication</Label>
+                    <p className="text-xs text-muted-foreground">
+                      Queue this post to drop at a future time.
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <Switch checked={scheduleEnabled} onCheckedChange={setScheduleEnabled} />
+                    <Input
+                      type="datetime-local"
+                      value={scheduledAt}
+                      onChange={(e) => setScheduledAt(e.target.value)}
+                      disabled={!scheduleEnabled}
+                      min={new Date(Date.now() + 60 * 1000).toISOString().slice(0, 16)}
+                    />
+                  </div>
+                </div>
+              </div>
+
               <div className="flex flex-wrap gap-4">
                 <Button onClick={handlePublish} disabled={loading}>
                   {loading ? (
@@ -368,11 +584,46 @@ function CreatePostPageContent() {
                 >
                   View Drafts
                 </Button>
+                <Button type="button" variant="outline" onClick={() => setPreviewOpen(true)}>
+                  Preview
+                </Button>
               </div>
+              <p className="text-xs text-muted-foreground">
+                {dirty ? 'Unsaved changes' : 'All changes saved'}
+              </p>
             </div>
           </CardContent>
         </Card>
       </div>
+
+      <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Preview</DialogTitle>
+            <DialogDescription>SSR-style preview of your post metadata.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="border rounded-lg p-4">
+              <p className="text-xs uppercase text-muted-foreground mb-2">{type}</p>
+              <h2 className="text-2xl font-bold mb-2">{title || 'Untitled draft'}</h2>
+              <p className="text-muted-foreground">
+                {excerpt || content.replace(/<[^>]+>/g, '').slice(0, 160)}
+              </p>
+            </div>
+            {featuredImage && (
+              <div className="relative w-full h-64">
+                <Image
+                  src={featuredImage}
+                  alt="Featured preview"
+                  fill
+                  unoptimized
+                  className="object-cover rounded-lg border"
+                />
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

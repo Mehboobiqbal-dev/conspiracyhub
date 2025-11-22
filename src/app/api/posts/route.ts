@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCollection } from '@/lib/db/mongodb';
 import { Post } from '@/lib/models/post';
-import { ObjectId } from 'mongodb';
+import { publishDueScheduledPosts } from '@/lib/utils/scheduled-posts';
 
 export async function GET(request: NextRequest) {
   try {
+    await publishDueScheduledPosts();
+
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '20');

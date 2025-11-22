@@ -1,9 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/middleware/auth';
+import type { AuthenticatedRequest } from '@/lib/middleware/auth';
 import { getCollection } from '@/lib/db/mongodb';
-import { Draft } from '@/lib/models/draft';
+import { Draft, DraftMedia } from '@/lib/models/draft';
 import { ObjectId } from 'mongodb';
 import { z } from 'zod';
+
+const mediaSchema = z.object({
+  url: z.string().url(),
+  type: z.enum(['image', 'video']),
+  caption: z.string().optional(),
+  altText: z.string().optional(),
+  thumbnail: z.string().optional(),
+});
 
 const updateDraftSchema = z.object({
   title: z.string().optional(),
@@ -11,6 +20,12 @@ const updateDraftSchema = z.object({
   type: z.enum(['conspiracy', 'opinion']).optional(),
   topicSlug: z.string().optional().nullable(),
   tags: z.array(z.string()).optional(),
+  excerpt: z.string().optional(),
+  featuredImage: z.string().optional(),
+  media: z.array(mediaSchema).optional(),
+  status: z.enum(['draft', 'scheduled']).optional(),
+  scheduledFor: z.string().datetime().optional().nullable(),
+  visibility: z.enum(['public', 'private']).optional(),
 });
 
 async function handler(
@@ -19,7 +34,11 @@ async function handler(
 ) {
   try {
     const { id } = await params;
-    const userId = (request as any).user.userId;
+    const { user } = request as AuthenticatedRequest;
+    const userId = user?.userId;
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
     const draftId = new ObjectId(id);
 
     const draftsCollection = await getCollection<Draft>('drafts');
@@ -40,7 +59,13 @@ async function handler(
     }
 
     if (request.method === 'GET') {
-      return NextResponse.json({ draft });
+      return NextResponse.json({
+        draft: {
+          ...draft,
+          _id: draft._id?.toString(),
+          authorId: draft.authorId?.toString(),
+        },
+      });
     }
 
     if (request.method === 'PUT') {
@@ -52,10 +77,25 @@ async function handler(
       };
 
       if (validated.title !== undefined) update.title = validated.title;
-      if (validated.content !== undefined) update.content = validated.content;
+      if (validated.content !== undefined) {
+        update.content = validated.content;
+        update.wordCount = validated.content
+          .replace(/<[^>]+>/g, ' ')
+          .trim()
+          .split(/\s+/)
+          .filter(Boolean).length;
+      }
       if (validated.type !== undefined) update.type = validated.type;
       if (validated.topicSlug !== undefined) update.topicSlug = validated.topicSlug || undefined;
       if (validated.tags !== undefined) update.tags = validated.tags;
+      if (validated.excerpt !== undefined) update.excerpt = validated.excerpt;
+      if (validated.featuredImage !== undefined) update.featuredImage = validated.featuredImage;
+      if (validated.media !== undefined) update.media = validated.media as DraftMedia[];
+      if (validated.status !== undefined) update.status = validated.status;
+      if (validated.scheduledFor !== undefined) {
+        update.scheduledFor = validated.scheduledFor ? new Date(validated.scheduledFor) : undefined;
+      }
+      if (validated.visibility !== undefined) update.visibility = validated.visibility;
 
       await draftsCollection.updateOne(
         { _id: draftId },
@@ -63,7 +103,13 @@ async function handler(
       );
 
       const updated = await draftsCollection.findOne({ _id: draftId });
-      return NextResponse.json({ draft: updated });
+      return NextResponse.json({
+        draft: {
+          ...updated,
+          _id: updated?._id?.toString(),
+          authorId: updated?.authorId?.toString(),
+        },
+      });
     }
 
     if (request.method === 'DELETE') {

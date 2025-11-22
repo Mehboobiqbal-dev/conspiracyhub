@@ -7,6 +7,7 @@ import { z } from 'zod';
 const updateUserSchema = z.object({
   name: z.string().min(2).max(100).optional(),
   bio: z.string().max(500).optional(),
+  avatar: z.string().url().or(z.literal('')).optional(),
 });
 
 async function handler(request: NextRequest) {
@@ -42,12 +43,19 @@ async function handler(request: NextRequest) {
 
       const usersCollection = await getCollection<User>('users');
       
-      const updateData: any = {
+      const updateData: Record<string, unknown> = {
         updatedAt: new Date(),
       };
 
       if (validated.name) updateData.name = validated.name;
       if (validated.bio !== undefined) updateData.bio = validated.bio;
+      if (validated.avatar !== undefined) {
+        if (validated.avatar) {
+          updateData.avatar = validated.avatar;
+        } else {
+          updateData.avatar = null;
+        }
+      }
 
       await usersCollection.updateOne(
         { _id: userId as any },

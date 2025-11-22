@@ -1,5 +1,13 @@
 import { ObjectId } from 'mongodb';
 
+export interface PostMedia {
+  url: string;
+  type: 'image' | 'video';
+  caption?: string;
+  altText?: string;
+  thumbnail?: string;
+}
+
 export interface Post {
   _id?: ObjectId;
   title: string;
@@ -16,12 +24,15 @@ export interface Post {
   views: number;
   tags: string[];
   slug: string; // SEO-friendly URL
-  status: 'published' | 'draft' | 'archived';
+  status: 'published' | 'draft' | 'archived' | 'scheduled';
+  visibility?: 'public' | 'private';
   createdAt: Date;
   updatedAt: Date;
   publishedAt?: Date;
+  scheduledFor?: Date;
   featuredImage?: string;
   excerpt?: string; // For SEO meta description
+  media?: PostMedia[];
   reportCount?: number;
   moderationStatus?: 'pending' | 'approved' | 'removed';
   moderatedBy?: ObjectId;

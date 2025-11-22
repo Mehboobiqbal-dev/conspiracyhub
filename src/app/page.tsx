@@ -56,9 +56,7 @@ export default async function HomePage() {
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h1 className="text-4xl font-headline font-bold mb-2">
-                ConspiracyHub
-              </h1>
+              
               <p className="text-muted-foreground text-lg">
                 Explore theories and opinions on current and historical topics
               </p>

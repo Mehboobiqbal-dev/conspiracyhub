@@ -52,3 +52,19 @@ export async function notifyVote(postAuthorId: string, voterId: string, postId: 
   });
 }
 
+export async function notifyScheduledPostPublished(
+  userId: ObjectId,
+  postId: ObjectId,
+  postSlug: string,
+  postTitle: string
+) {
+  await createNotification({
+    userId,
+    type: 'scheduled_publish',
+    title: 'Scheduled post published',
+    message: `"${postTitle}" is now live.`,
+    link: `/p/${postSlug}`,
+    relatedPostId: postId,
+  });
+}
+

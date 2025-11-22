@@ -4,10 +4,13 @@ import { getCollection } from '@/lib/db/mongodb';
 import { Post } from '@/lib/models/post';
 import { UserStats } from '@/lib/models/user-activity';
 import { UserFollow } from '@/lib/models/user-follow';
+import { publishDueScheduledPosts } from '@/lib/utils/scheduled-posts';
 import { ObjectId } from 'mongodb';
 
 async function handler(request: NextRequest) {
   try {
+    await publishDueScheduledPosts();
+
     const userId = (request as any).user.userId;
     const { searchParams } = new URL(request.url);
     const limit = parseInt(searchParams.get('limit') || '50');

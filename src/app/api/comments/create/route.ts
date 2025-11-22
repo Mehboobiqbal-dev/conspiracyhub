@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/middleware/auth';
+import type { AuthenticatedRequest } from '@/lib/middleware/auth';
 import { getCollection } from '@/lib/db/mongodb';
 import { Comment } from '@/lib/models/comment';
 import { Post } from '@/lib/models/post';
@@ -8,17 +9,34 @@ import { z } from 'zod';
 import { ObjectId } from 'mongodb';
 import { notifyCommentReply, notifyPostReply } from '@/lib/utils/notifications';
 
+const attachmentSchema = z.object({
+  url: z.string().url(),
+  type: z.enum(['image', 'video']).default('image'),
+  altText: z.string().optional(),
+  caption: z.string().optional(),
+  thumbnail: z.string().optional(),
+}).optional();
+
 const createCommentSchema = z.object({
   postId: z.string(),
   content: z.string().min(1).max(5000),
   parentId: z.string().optional(),
+  attachment: attachmentSchema,
 });
 
 async function handler(request: NextRequest) {
   try {
     const body = await request.json();
     const validated = createCommentSchema.parse(body);
-    const userId = (request as any).user.userId;
+    const { user } = request as AuthenticatedRequest;
+    const userId = user?.userId;
+
+    if (!userId) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
 
     const commentsCollection = await getCollection<Comment>('comments');
     const postsCollection = await getCollection<Post>('posts');
@@ -35,9 +53,9 @@ async function handler(request: NextRequest) {
     }
 
     // Get user info
-    const user = await usersCollection.findOne({ _id: userId as any });
-    const authorName = user?.name || 'Anonymous';
-    const authorAvatar = user?.avatar;
+    const commenter = await usersCollection.findOne({ _id: new ObjectId(userId) });
+    const authorName = commenter?.name || 'Anonymous';
+    const authorAvatar = commenter?.avatar;
 
     // If parentId provided, verify it exists
     if (validated.parentId) {
@@ -53,10 +71,19 @@ async function handler(request: NextRequest) {
 
     const newComment: Omit<Comment, '_id'> = {
       postId: postObjectId,
-      authorId: userId as any,
+      authorId: new ObjectId(userId),
       authorName,
       authorAvatar,
       content: validated.content,
+      attachment: validated.attachment
+        ? {
+            url: validated.attachment.url,
+            type: validated.attachment.type,
+            altText: validated.attachment.altText,
+            caption: validated.attachment.caption,
+            thumbnail: validated.attachment.thumbnail,
+          }
+        : undefined,
       parentId: validated.parentId ? new ObjectId(validated.parentId) : undefined,
       upvotes: 0,
       downvotes: 0,
