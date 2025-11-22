@@ -27,7 +27,7 @@ const mediaSchema = z.object({
 });
 
 const autosaveSchema = z.object({
-  draftId: z.string().optional(),
+  draftId: z.string().nullable().optional(), // Accept null, undefined, or string
   title: z.string().optional(),
   content: z.string(), // Remove min(1) - allow empty for drafts
   type: z.enum(['conspiracy', 'opinion']).optional(),
