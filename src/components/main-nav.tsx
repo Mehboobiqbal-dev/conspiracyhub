@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useMemo } from 'react';
 import { useAuth } from '@/contexts/auth-context';
