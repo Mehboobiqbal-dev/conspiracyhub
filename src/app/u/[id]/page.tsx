@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { ArrowUp, MessageCircle, Eye, Clock } from 'lucide-react';
+import { ArrowUp, MessageCircle, Eye, Clock, User as UserIcon } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { ObjectId } from 'mongodb';
 import { Trophy, TrendingUp, MessageSquare, FileText } from 'lucide-react';
@@ -21,6 +21,12 @@ interface PageProps {
 
 async function getUserProfile(userId: string) {
   try {
+    // Validate userId before creating ObjectId
+    if (!userId || userId === 'undefined' || !ObjectId.isValid(userId)) {
+      console.error('Invalid userId:', userId);
+      return null;
+    }
+
     const usersCollection = await getCollection<User>('users');
     const user = await usersCollection.findOne({ _id: new ObjectId(userId) });
 
@@ -78,6 +84,13 @@ async function getUserProfile(userId: string) {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params;
+  
+  if (!id || id === 'undefined') {
+    return {
+      title: 'User Not Found',
+    };
+  }
+  
   const data = await getUserProfile(id);
   
   if (!data) {
@@ -96,6 +109,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function UserProfilePage({ params }: PageProps) {
   const { id } = await params;
+  
+  if (!id || id === 'undefined') {
+    notFound();
+  }
+  
   const data = await getUserProfile(id);
 
   if (!data) {

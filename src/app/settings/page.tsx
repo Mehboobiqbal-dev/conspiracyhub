@@ -89,12 +89,11 @@ export default function SettingsPage() {
       const result = await uploadMedia(file, 'image');
       setAvatar(result.url);
 
-      const response = await fetch('/api/users/me', {
+      const response = await authenticatedFetch('/api/users/me', {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials: 'include',
         body: JSON.stringify({ avatar: result.url }),
       });
 
@@ -126,12 +125,11 @@ export default function SettingsPage() {
     if (!avatar) return;
     setAvatarUploading(true);
     try {
-      const response = await fetch('/api/users/me', {
+      const response = await authenticatedFetch('/api/users/me', {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials: 'include',
         body: JSON.stringify({ avatar: '' }),
       });
 

@@ -40,7 +40,8 @@ export interface User {
 }
 
 export interface UserProfile {
-  _id: string;
+  id: string;
+  _id?: string; // Keep for backward compatibility
   email: string;
   name: string;
   role: string;
@@ -52,8 +53,10 @@ export interface UserProfile {
 }
 
 export function sanitizeUser(user: User): UserProfile {
+  const userId = user._id?.toString() || '';
   return {
-    _id: user._id?.toString() || '',
+    id: userId, // Primary field for client-side
+    _id: userId, // Keep for backward compatibility
     email: user.email,
     name: user.name,
     role: user.role,

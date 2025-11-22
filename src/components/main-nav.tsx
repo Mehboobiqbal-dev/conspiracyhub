@@ -187,7 +187,7 @@ export function MainNav() {
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
-                      <Link href={`/u/${user.id}`}>
+                      <Link href={user.id ? `/u/${user.id}` : '#'}>
                         <User className="mr-2 h-4 w-4" />
                         Profile
                       </Link>
