@@ -10,6 +10,7 @@ export async function POST(request: NextRequest) {
                         request.headers.get('x-refresh-token');
 
     if (!refreshToken) {
+      console.error('Refresh token missing from request');
       return NextResponse.json(
         { error: 'Refresh token required' },
         { status: 401 }
@@ -17,16 +18,34 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify refresh token
-    const payload = verifyRefreshToken(refreshToken);
+    let payload;
+    try {
+      payload = verifyRefreshToken(refreshToken);
+    } catch (error) {
+      console.error('Refresh token verification failed:', error);
+      return NextResponse.json(
+        { error: 'Invalid or expired refresh token' },
+        { status: 401 }
+      );
+    }
 
     // Verify token exists in user's refresh tokens
     const usersCollection = await getCollection<User>('users');
     const user = await usersCollection.findOne({ 
       _id: payload.userId as any,
-      refreshTokens: refreshToken,
     });
 
     if (!user) {
+      console.error('User not found for refresh token:', payload.userId);
+      return NextResponse.json(
+        { error: 'User not found' },
+        { status: 401 }
+      );
+    }
+
+    // Check if refresh token exists in user's refresh tokens array
+    if (!user.refreshTokens || !user.refreshTokens.includes(refreshToken)) {
+      console.error('Refresh token not found in user\'s refresh tokens');
       return NextResponse.json(
         { error: 'Invalid refresh token' },
         { status: 401 }

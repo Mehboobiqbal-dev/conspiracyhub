@@ -74,11 +74,18 @@ export async function POST(request: NextRequest) {
       role: user.role,
     });
 
-    // Store refresh token
-    await usersCollection.updateOne(
-      { _id: user._id },
-      { $push: { refreshTokens: refreshToken } }
-    );
+    // Store refresh token (initialize array if it doesn't exist)
+    if (!user.refreshTokens || !Array.isArray(user.refreshTokens)) {
+      await usersCollection.updateOne(
+        { _id: user._id },
+        { $set: { refreshTokens: [refreshToken] } }
+      );
+    } else {
+      await usersCollection.updateOne(
+        { _id: user._id },
+        { $push: { refreshTokens: refreshToken } }
+      );
+    }
 
     // Store session in Redis
     await setSession(`user:${userId}`, {

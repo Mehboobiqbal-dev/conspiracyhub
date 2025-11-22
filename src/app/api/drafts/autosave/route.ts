@@ -116,14 +116,16 @@ async function handler(request: NextRequest) {
     };
 
     const { draftId } = validated;
-    if (draftId) {
-      const draftObjectId = new ObjectId(draftId);
+    // Convert null to undefined for consistency
+    const draftIdToUse = draftId || undefined;
+    if (draftIdToUse) {
+      const draftObjectId = new ObjectId(draftIdToUse);
       await draftsCollection.updateOne(
         { _id: draftObjectId, authorId: authorObjectId },
         { $set: updatePayload, $setOnInsert: { createdAt: now, authorId: authorObjectId } },
         { upsert: true }
       );
-      return NextResponse.json({ draftId });
+      return NextResponse.json({ draftId: draftIdToUse });
     }
 
     const result = await draftsCollection.insertOne({

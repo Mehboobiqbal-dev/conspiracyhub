@@ -12,6 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Upload, X } from 'lucide-react';
 import { uploadMedia } from '@/lib/uploads/client';
+import { authenticatedFetch } from '@/lib/auth/fetch';
 
 export default function SettingsPage() {
   const { user, loading: authLoading, refreshUser } = useAuth();
@@ -43,17 +44,21 @@ export default function SettingsPage() {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/users/me', {
+      const response = await authenticatedFetch('/api/users/me', {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials: 'include',
-        body: JSON.stringify({ name, bio }),
+        body: JSON.stringify({ 
+          name: name.trim(),
+          bio: bio.trim(), // Ensure bio is sent even if empty
+        }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error('Failed to update profile');
+        throw new Error(data.error || 'Failed to update profile');
       }
 
       toast({

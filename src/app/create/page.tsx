@@ -166,7 +166,7 @@ function CreatePostPageContent() {
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({
-          draftId,
+          draftId: draftId || undefined, // Convert null to undefined
           title,
           content: editorContent,
           type,
