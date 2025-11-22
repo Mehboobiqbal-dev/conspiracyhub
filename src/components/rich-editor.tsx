@@ -40,6 +40,7 @@ import {
 import { uploadMedia, UploadKind } from '@/lib/uploads/client';
 import { cn } from '@/lib/utils';
 import { Loader2 } from 'lucide-react';
+import Swal from 'sweetalert2';
 
 type SlashCommandItem = {
   title: string;
@@ -310,13 +311,33 @@ export function RichEditor({
     },
   });
 
-  const setLink = useCallback(() => {
+  const setLink = useCallback(async () => {
     if (!editor) return;
 
     const previousUrl = editor.getAttributes('link').href;
-    const url = window.prompt('URL', previousUrl);
+    
+    const { value: url } = await Swal.fire({
+      title: 'Add Link',
+      input: 'url',
+      inputLabel: 'URL',
+      inputValue: previousUrl || '',
+      inputPlaceholder: 'https://example.com',
+      showCancelButton: true,
+      confirmButtonText: 'Add Link',
+      cancelButtonText: 'Cancel',
+      inputValidator: (value) => {
+        if (!value) {
+          return 'Please enter a URL';
+        }
+        try {
+          new URL(value);
+        } catch {
+          return 'Please enter a valid URL';
+        }
+      },
+    });
 
-    if (url === null) {
+    if (!url) {
       return;
     }
 
@@ -342,9 +363,35 @@ export function RichEditor({
         setUploading(kind);
         try {
           const result = await uploadMedia(file, kind);
-          const caption = window.prompt('Add a caption (optional)') || undefined;
-          const altText =
-            kind === 'image' ? window.prompt('Add alt text for accessibility (optional)') || undefined : undefined;
+          
+          // Get caption
+          const captionResult = await Swal.fire({
+            title: 'Add Caption',
+            input: 'text',
+            inputLabel: 'Caption (optional)',
+            inputPlaceholder: 'Enter a caption for this media',
+            showCancelButton: true,
+            confirmButtonText: kind === 'image' ? 'Next' : 'Done',
+            cancelButtonText: 'Skip',
+            allowOutsideClick: false,
+          });
+          const caption = captionResult.value || undefined;
+
+          // Get alt text for images
+          let altText: string | undefined;
+          if (kind === 'image') {
+            const altResult = await Swal.fire({
+              title: 'Add Alt Text',
+              input: 'text',
+              inputLabel: 'Alt text for accessibility (optional)',
+              inputPlaceholder: 'Describe the image for screen readers',
+              showCancelButton: true,
+              confirmButtonText: 'Done',
+              cancelButtonText: 'Skip',
+              allowOutsideClick: false,
+            });
+            altText = altResult.value || undefined;
+          }
 
           if (kind === 'image') {
             editor
@@ -374,7 +421,12 @@ export function RichEditor({
         } catch (error) {
           const message = error instanceof Error ? error.message : 'Failed to upload media';
           console.error('Media upload error:', error);
-          alert(message);
+          await Swal.fire({
+            icon: 'error',
+            title: 'Upload Failed',
+            text: message,
+            confirmButtonText: 'OK',
+          });
         } finally {
           setUploading(null);
         }

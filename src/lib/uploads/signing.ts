@@ -31,7 +31,29 @@ export function verifySignature(
   payload: UploadSignaturePayload,
   signature: string
 ) {
-  const expected = signPayload(payload);
-  return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(signature));
+  try {
+    const expected = signPayload(payload);
+    
+    // Both are hex strings (64 characters for SHA256)
+    // Use timingSafeEqual for constant-time comparison to prevent timing attacks
+    if (expected.length !== signature.length) {
+      return false;
+    }
+    
+    // Convert hex strings to buffers for timing-safe comparison
+    // Hex strings are already in hex format, so we read them as hex
+    const expectedBuffer = Buffer.from(expected, 'hex');
+    const signatureBuffer = Buffer.from(signature, 'hex');
+    
+    // Both should be 32 bytes (256 bits / 8) for SHA256
+    if (expectedBuffer.length !== signatureBuffer.length || expectedBuffer.length !== 32) {
+      return false;
+    }
+    
+    return crypto.timingSafeEqual(expectedBuffer, signatureBuffer);
+  } catch (error) {
+    console.error('Signature verification error:', error);
+    return false;
+  }
 }
 

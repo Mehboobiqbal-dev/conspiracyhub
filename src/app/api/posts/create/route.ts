@@ -9,11 +9,23 @@ import { z } from 'zod';
 import { ObjectId } from 'mongodb';
 
 const mediaSchema = z.object({
-  url: z.string().url(),
+  url: z.string().refine(
+    (val) => {
+      if (!val || val.trim() === '') return true; // Allow empty
+      // Allow absolute URLs or relative paths starting with /
+      try {
+        new URL(val);
+        return true; // Valid absolute URL
+      } catch {
+        return val.startsWith('/'); // Valid relative path
+      }
+    },
+    { message: 'URL must be a valid absolute URL or relative path starting with /' }
+  ),
   type: z.enum(['image', 'video']),
-  caption: z.string().optional(),
-  altText: z.string().optional(),
-  thumbnail: z.string().optional(),
+  caption: z.string().optional().nullable(),
+  altText: z.string().optional().nullable(),
+  thumbnail: z.string().optional().nullable(),
 });
 
 const createPostSchema = z.object({
@@ -32,7 +44,32 @@ const createPostSchema = z.object({
 async function handler(request: NextRequest) {
   try {
     const body = await request.json();
-    const validated = createPostSchema.parse(body);
+    let validated;
+    try {
+      validated = createPostSchema.parse(body);
+    } catch (validationError) {
+      if (validationError instanceof z.ZodError) {
+        console.error('Post creation validation error:', {
+          errors: validationError.errors,
+          body: {
+            ...body,
+            content: body.content ? `${body.content.substring(0, 100)}...` : 'empty',
+          },
+        });
+        return NextResponse.json(
+          { 
+            error: 'Validation failed', 
+            details: validationError.errors.map(e => ({
+              path: e.path.join('.'),
+              message: e.message,
+              code: e.code,
+            }))
+          },
+          { status: 400 }
+        );
+      }
+      throw validationError;
+    }
     const { user } = request as AuthenticatedRequest;
     const userId = user?.userId;
     if (!userId) {
@@ -72,7 +109,8 @@ async function handler(request: NextRequest) {
 
     // Generate excerpt for SEO
     const excerpt = (validated.excerpt || validated.content.substring(0, 160)).replace(/\n/g, ' ').trim();
-    const media = (validated.media as PostMedia[]) || [];
+    // Filter out media items with empty URLs
+    const media = (validated.media?.filter((m) => m.url && m.url.trim() !== '') as PostMedia[]) || [];
     const publishAt = validated.publishAt ? new Date(validated.publishAt) : null;
     const isScheduled = publishAt && publishAt.getTime() > Date.now() + 60 * 1000;
 

@@ -16,11 +16,23 @@ const createDraftSchema = z.object({
   featuredImage: z.string().optional(),
   media: z.array(
     z.object({
-      url: z.string().url(),
+      url: z.string().refine(
+        (val) => {
+          if (!val || val.trim() === '') return true; // Allow empty
+          // Allow absolute URLs or relative paths starting with /
+          try {
+            new URL(val);
+            return true; // Valid absolute URL
+          } catch {
+            return val.startsWith('/'); // Valid relative path
+          }
+        },
+        { message: 'URL must be a valid absolute URL or relative path starting with /' }
+      ),
       type: z.enum(['image', 'video']),
-      caption: z.string().optional(),
-      altText: z.string().optional(),
-      thumbnail: z.string().optional(),
+      caption: z.string().optional().nullable(),
+      altText: z.string().optional().nullable(),
+      thumbnail: z.string().optional().nullable(),
     })
   ).optional(),
   status: z.enum(['draft', 'scheduled']).optional(),
@@ -51,7 +63,7 @@ async function handler(request: NextRequest) {
       tags: validated.tags || [],
       excerpt: validated.excerpt,
       featuredImage: validated.featuredImage,
-      media: (validated.media as DraftMedia[]) || [],
+      media: (validated.media?.filter((m) => m.url && m.url.trim() !== '') as DraftMedia[]) || [],
       createdAt: now,
       updatedAt: now,
       autosavedAt: now,

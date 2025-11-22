@@ -13,6 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { formatDistanceToNow } from 'date-fns';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/auth-context';
+import { authenticatedFetch } from '@/lib/auth/fetch';
 
 interface Notification {
   _id: string;
@@ -42,9 +43,7 @@ export function NotificationBell() {
     if (!user) return;
     
     try {
-      const response = await fetch('/api/notifications?limit=20&unread=true', {
-        credentials: 'include',
-      });
+      const response = await authenticatedFetch('/api/notifications?limit=20&unread=true');
       const data = await response.json();
       if (response.ok) {
         setNotifications(data.notifications || []);
@@ -57,9 +56,8 @@ export function NotificationBell() {
 
   const markAsRead = async (id: string) => {
     try {
-      await fetch(`/api/notifications/${id}/read`, {
+      await authenticatedFetch(`/api/notifications/${id}/read`, {
         method: 'POST',
-        credentials: 'include',
       });
       fetchNotifications();
     } catch (error) {
@@ -70,9 +68,8 @@ export function NotificationBell() {
   const markAllAsRead = async () => {
     setLoading(true);
     try {
-      await fetch('/api/notifications/read-all', {
+      await authenticatedFetch('/api/notifications/read-all', {
         method: 'POST',
-        credentials: 'include',
       });
       fetchNotifications();
     } catch (error) {

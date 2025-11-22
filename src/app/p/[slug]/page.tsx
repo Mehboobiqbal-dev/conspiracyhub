@@ -213,9 +213,10 @@ export default async function PostPage({ params }: PageProps) {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="prose prose-lg dark:prose-invert max-w-none mb-6">
-                <div className="whitespace-pre-wrap">{post.content}</div>
-              </div>
+              <div 
+                className="prose prose-lg dark:prose-invert max-w-none mb-6 prose-img:rounded-lg prose-img:my-4 prose-video:rounded-lg prose-video:my-4 prose-figure:my-4"
+                dangerouslySetInnerHTML={{ __html: post.content }}
+              />
 
               <div className="flex items-center justify-between pt-4 border-t">
                 <div className="flex items-center gap-4">

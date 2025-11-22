@@ -7,11 +7,23 @@ import { ObjectId } from 'mongodb';
 import { z } from 'zod';
 
 const mediaSchema = z.object({
-  url: z.string().url(),
+  url: z.string().refine(
+    (val) => {
+      if (!val || val.trim() === '') return true; // Allow empty
+      // Allow absolute URLs or relative paths starting with /
+      try {
+        new URL(val);
+        return true; // Valid absolute URL
+      } catch {
+        return val.startsWith('/'); // Valid relative path
+      }
+    },
+    { message: 'URL must be a valid absolute URL or relative path starting with /' }
+  ),
   type: z.enum(['image', 'video']),
-  caption: z.string().optional(),
-  altText: z.string().optional(),
-  thumbnail: z.string().optional(),
+  caption: z.string().optional().nullable(),
+  altText: z.string().optional().nullable(),
+  thumbnail: z.string().optional().nullable(),
 });
 
 const updateDraftSchema = z.object({
@@ -90,7 +102,11 @@ async function handler(
       if (validated.tags !== undefined) update.tags = validated.tags;
       if (validated.excerpt !== undefined) update.excerpt = validated.excerpt;
       if (validated.featuredImage !== undefined) update.featuredImage = validated.featuredImage;
-      if (validated.media !== undefined) update.media = validated.media as DraftMedia[];
+      if (validated.media !== undefined) {
+        // Filter out media items with empty URLs
+        const validMedia = validated.media.filter((m) => m.url && m.url.trim() !== '');
+        update.media = validMedia as DraftMedia[];
+      }
       if (validated.status !== undefined) update.status = validated.status;
       if (validated.scheduledFor !== undefined) {
         update.scheduledFor = validated.scheduledFor ? new Date(validated.scheduledFor) : undefined;

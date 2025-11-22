@@ -7,25 +7,37 @@ import { ObjectId } from 'mongodb';
 import { z } from 'zod';
 
 const mediaSchema = z.object({
-  url: z.string().url(),
+  url: z.string().refine(
+    (val) => {
+      if (!val || val.trim() === '') return true; // Allow empty
+      // Allow absolute URLs or relative paths starting with /
+      try {
+        new URL(val);
+        return true; // Valid absolute URL
+      } catch {
+        return val.startsWith('/'); // Valid relative path
+      }
+    },
+    { message: 'URL must be a valid absolute URL or relative path starting with /' }
+  ),
   type: z.enum(['image', 'video']),
-  caption: z.string().optional(),
-  altText: z.string().optional(),
-  thumbnail: z.string().optional(),
+  caption: z.string().optional().nullable(),
+  altText: z.string().optional().nullable(),
+  thumbnail: z.string().optional().nullable(),
 });
 
 const autosaveSchema = z.object({
   draftId: z.string().optional(),
   title: z.string().optional(),
-  content: z.string().min(1),
+  content: z.string(), // Remove min(1) - allow empty for drafts
   type: z.enum(['conspiracy', 'opinion']).optional(),
   topicSlug: z.string().optional().nullable(),
   tags: z.array(z.string()).optional(),
-  excerpt: z.string().optional(),
-  featuredImage: z.string().optional(),
+  excerpt: z.string().optional().nullable(),
+  featuredImage: z.string().optional().nullable(),
   media: z.array(mediaSchema).optional(),
   status: z.enum(['draft', 'scheduled']).optional(),
-  scheduledFor: z.string().datetime().optional(),
+  scheduledFor: z.string().datetime().optional().nullable(),
   visibility: z.enum(['public', 'private']).optional(),
 });
 
@@ -37,31 +49,69 @@ function getWordCount(html: string) {
 
 async function handler(request: NextRequest) {
   try {
-    const body = await request.json();
-    const validated = autosaveSchema.parse(body);
     const { user } = request as AuthenticatedRequest;
     const userId = user?.userId;
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    let body;
+    try {
+      body = await request.json();
+    } catch (parseError) {
+      return NextResponse.json(
+        { error: 'Invalid JSON in request body' },
+        { status: 400 }
+      );
+    }
+
+    let validated;
+    try {
+      validated = autosaveSchema.parse(body);
+    } catch (validationError) {
+      if (validationError instanceof z.ZodError) {
+        console.error('Autosave validation error:', {
+          errors: validationError.errors,
+          body: {
+            ...body,
+            content: body.content ? `${body.content.substring(0, 100)}...` : 'empty',
+          },
+        });
+        return NextResponse.json(
+          { 
+            error: 'Validation failed', 
+            details: validationError.errors.map(e => ({
+              path: e.path.join('.'),
+              message: e.message,
+              code: e.code,
+            }))
+          },
+          { status: 400 }
+        );
+      }
+      throw validationError;
+    }
     const draftsCollection = await getCollection<Draft>('drafts');
     const now = new Date();
     const authorObjectId = new ObjectId(userId);
 
+    // Filter out media items with empty URLs
+    const validMedia = validated.media?.filter((m) => m.url && m.url.trim() !== '') || [];
+
     const updatePayload: Partial<Draft> = {
       title: validated.title ?? '',
-      content: validated.content,
+      content: validated.content || '<p></p>', // Default to empty paragraph if content is empty
       type: validated.type || 'conspiracy',
       topicSlug: validated.topicSlug || undefined,
       tags: validated.tags || [],
-      excerpt: validated.excerpt,
-      featuredImage: validated.featuredImage,
-      media: (validated.media as DraftMedia[]) || [],
+      excerpt: validated.excerpt || undefined,
+      featuredImage: validated.featuredImage || undefined,
+      media: validMedia as DraftMedia[],
       status: validated.status || 'draft',
       scheduledFor: validated.scheduledFor ? new Date(validated.scheduledFor) : undefined,
       autosavedAt: now,
       updatedAt: now,
-      wordCount: getWordCount(validated.content),
+      wordCount: getWordCount(validated.content || ''),
       visibility: validated.visibility || 'public',
     };
 

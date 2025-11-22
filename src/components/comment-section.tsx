@@ -122,12 +122,12 @@ export function CommentSection({ postId, postSlug }: CommentSectionProps) {
     setSubmitting(true);
 
     try {
-      const response = await fetch('/api/comments/create', {
+      const { authenticatedFetch } = await import('@/lib/auth/fetch');
+      const response = await authenticatedFetch('/api/comments/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials: 'include',
         body: JSON.stringify({
           postId,
           content: newComment,
