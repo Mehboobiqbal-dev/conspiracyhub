@@ -15,6 +15,7 @@ import { PostVoteButtons } from '@/components/post-vote-buttons';
 import { PostActions } from '@/components/post-actions';
 import { PostMenu } from '@/components/post-menu';
 import { RelativeTime } from '@/components/relative-time';
+import { PostTranslator } from '@/components/post-translator';
 
 interface PageProps {
   params: { slug: string } | Promise<{ slug: string }>;
@@ -213,7 +214,9 @@ export default async function PostPage({ params }: PageProps) {
               </div>
             </CardHeader>
             <CardContent>
+              <PostTranslator content={post.content} originalLanguage="en" />
               <div 
+                id="post-content"
                 className="prose prose-lg dark:prose-invert max-w-none mb-6 prose-img:rounded-lg prose-img:my-4 prose-video:rounded-lg prose-video:my-4 prose-figure:my-4"
                 dangerouslySetInnerHTML={{ __html: post.content }}
               />

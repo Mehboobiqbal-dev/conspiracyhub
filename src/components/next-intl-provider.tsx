@@ -2,8 +2,8 @@
 
 import { NextIntlClientProvider } from 'next-intl';
 import { useLocale } from '@/contexts/locale-context';
-import { ReactNode, useEffect, useState } from 'react';
-import enMessages from '../../messages/en.json';
+import { ReactNode, useMemo } from 'react';
+import { getMessages } from '@/lib/i18n/messages';
 
 // Get user's timezone or default to UTC
 function getUserTimeZone(): string {
@@ -15,27 +15,8 @@ function getUserTimeZone(): string {
 
 export function NextIntlProviderWrapper({ children }: { children: ReactNode }) {
   const { locale } = useLocale();
-  const [messages, setMessages] = useState<Record<string, any>>(enMessages);
-  const [timeZone] = useState<string>(() => getUserTimeZone());
-
-  useEffect(() => {
-    // Dynamically load translations
-    const loadMessages = async () => {
-      try {
-        const mod = await import(`../../messages/${locale}.json`);
-        setMessages(mod.default);
-      } catch (error) {
-        console.error(`Failed to load messages for locale ${locale}, falling back to English`, error);
-        setMessages(enMessages);
-      }
-    };
-    
-    if (locale !== 'en') {
-      loadMessages();
-    } else {
-      setMessages(enMessages);
-    }
-  }, [locale]);
+  const messages = useMemo(() => getMessages(locale), [locale]);
+  const timeZone = useMemo(() => getUserTimeZone(), []);
 
   return (
     <NextIntlClientProvider 

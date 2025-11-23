@@ -32,6 +32,23 @@
     "submit": "Submit",
     "confirm": "Confirm"
   },
+  "post": {
+    "translate": "Translate",
+    "translating": "Translating...",
+    "translateTo": "Translate to",
+    "showOriginal": "Show Original",
+    "showTranslation": "Show Translation",
+    "translationError": "Failed to translate. Please try again.",
+    "trending": "Trending",
+    "trendingBadge": "Trending",
+    "noTrendingPosts": "No trending posts yet.",
+    "mostPopular": "Most popular posts in the last 7 days",
+    "by": "by",
+    "views": "views",
+    "comments": "Comments",
+    "upvotes": "Upvotes",
+    "aiGenerated": "AI Generated"
+  },
   "language": {
     "select": "Select Language",
     "english": "English",
