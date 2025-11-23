@@ -47,7 +47,34 @@
     "views": "views",
     "comments": "Comments",
     "upvotes": "Upvotes",
-    "aiGenerated": "AI Generated"
+    "aiGenerated": "AI Generated",
+    "noPosts": "No posts yet. Be the first to share!",
+    "loadMore": "Load More",
+    "noMorePosts": "No more posts to load",
+    "showing": "Showing",
+    "of": "of",
+    "posts": "posts"
+  },
+  "feed": {
+    "yourFeed": "Your Feed",
+    "feedDescription": "Posts from topics and users you follow"
+  },
+  "home": {
+    "explore": "Explore theories and opinions on current and historical topics",
+    "createPost": "Create Post"
+  },
+  "filters": {
+    "sortBy": "Sort by",
+    "filterByType": "Filter by type",
+    "allTypes": "All Types",
+    "conspiracy": "Conspiracy",
+    "opinion": "Opinion",
+    "newest": "Newest",
+    "hot": "Hot",
+    "trending": "Trending",
+    "mostPopular": "Most Popular",
+    "top": "Top",
+    "controversial": "Controversial"
   },
   "language": {
     "select": "Select Language",

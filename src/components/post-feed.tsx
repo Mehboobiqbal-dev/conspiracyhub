@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -35,6 +36,9 @@ interface PostFeedProps {
 }
 
 export function PostFeed({ initialPosts, feedType = 'public', topicSlug }: PostFeedProps = {}) {
+  const t = useTranslations('filters');
+  const tPost = useTranslations('post');
+  const tCommon = useTranslations('common');
   const [posts, setPosts] = useState<Post[]>(initialPosts || []);
   const [loading, setLoading] = useState(!initialPosts);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -133,15 +137,15 @@ export function PostFeed({ initialPosts, feedType = 'public', topicSlug }: PostF
           setPage(1);
         }}>
           <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Sort by" />
+            <SelectValue placeholder={t('sortBy')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="newest">Newest</SelectItem>
-            <SelectItem value="hot">Hot</SelectItem>
-            <SelectItem value="trending">Trending</SelectItem>
-            <SelectItem value="popular">Most Popular</SelectItem>
-            <SelectItem value="top">Top</SelectItem>
-            <SelectItem value="controversial">Controversial</SelectItem>
+            <SelectItem value="newest">{t('newest')}</SelectItem>
+            <SelectItem value="hot">{t('hot')}</SelectItem>
+            <SelectItem value="trending">{t('trending')}</SelectItem>
+            <SelectItem value="popular">{t('mostPopular')}</SelectItem>
+            <SelectItem value="top">{t('top')}</SelectItem>
+            <SelectItem value="controversial">{t('controversial')}</SelectItem>
           </SelectContent>
         </Select>
 
@@ -150,18 +154,18 @@ export function PostFeed({ initialPosts, feedType = 'public', topicSlug }: PostF
           setPage(1);
         }}>
           <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Filter by type" />
+            <SelectValue placeholder={t('filterByType')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Types</SelectItem>
-            <SelectItem value="conspiracy">Conspiracy</SelectItem>
-            <SelectItem value="opinion">Opinion</SelectItem>
+            <SelectItem value="all">{t('allTypes')}</SelectItem>
+            <SelectItem value="conspiracy">{t('conspiracy')}</SelectItem>
+            <SelectItem value="opinion">{t('opinion')}</SelectItem>
           </SelectContent>
         </Select>
 
         {pagination && (
           <div className="text-sm text-muted-foreground ml-auto">
-            Showing {posts.length} of {pagination.total} posts
+            {tPost('showing')} {posts.length} {tPost('of')} {pagination.total} {tPost('posts')}
           </div>
         )}
       </div>
@@ -171,7 +175,7 @@ export function PostFeed({ initialPosts, feedType = 'public', topicSlug }: PostF
         {posts.length === 0 ? (
           <Card>
             <CardContent className="py-12 text-center">
-              <p className="text-muted-foreground">No posts yet. Be the first to share!</p>
+              <p className="text-muted-foreground">{tPost('noPosts')}</p>
             </CardContent>
           </Card>
         ) : (
@@ -257,10 +261,10 @@ export function PostFeed({ initialPosts, feedType = 'public', topicSlug }: PostF
             {loadingMore ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Loading...
+                {tCommon('loading')}
               </>
             ) : (
-              'Load More'
+              tPost('loadMore')
             )}
           </Button>
         </div>
@@ -268,7 +272,7 @@ export function PostFeed({ initialPosts, feedType = 'public', topicSlug }: PostF
 
       {!hasMore && posts.length > 0 && (
         <div className="text-center text-muted-foreground py-4">
-          No more posts to load
+          {tPost('noMorePosts')}
         </div>
       )}
     </div>
