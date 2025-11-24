@@ -32,6 +32,50 @@
     "submit": "送信",
     "confirm": "確認"
   },
+  "post": {
+    "translate": "翻訳",
+    "translating": "翻訳中...",
+    "translateTo": "翻訳先",
+    "showOriginal": "原文を表示",
+    "showTranslation": "翻訳を表示",
+    "translationError": "翻訳に失敗しました。もう一度お試しください。",
+    "trending": "トレンド",
+    "trendingBadge": "トレンド",
+    "noTrendingPosts": "まだトレンドの投稿はありません。",
+    "mostPopular": "過去7日間で最も人気のある投稿",
+    "by": "作成者",
+    "views": "閲覧数",
+    "comments": "コメント",
+    "upvotes": "賛成票",
+    "aiGenerated": "AI生成",
+    "noPosts": "まだ投稿がありません。最初にシェアしましょう！",
+    "loadMore": "さらに読み込む",
+    "noMorePosts": "これ以上読み込む投稿はありません",
+    "showing": "表示中",
+    "of": "/",
+    "posts": "投稿"
+  },
+  "feed": {
+    "yourFeed": "あなたのフィード",
+    "feedDescription": "フォローしているトピックとユーザーの投稿"
+  },
+  "home": {
+    "explore": "現在および歴史的なトピックに関する理論と意見を探索",
+    "createPost": "投稿を作成"
+  },
+  "filters": {
+    "sortBy": "並び替え",
+    "filterByType": "タイプでフィルター",
+    "allTypes": "すべてのタイプ",
+    "conspiracy": "陰謀論",
+    "opinion": "意見",
+    "newest": "最新",
+    "hot": "人気",
+    "trending": "トレンド",
+    "mostPopular": "最も人気",
+    "top": "トップ",
+    "controversial": "議論の的"
+  },
   "language": {
     "select": "言語を選択",
     "english": "英語",

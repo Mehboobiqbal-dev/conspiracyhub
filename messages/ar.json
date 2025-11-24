@@ -32,6 +32,50 @@
     "submit": "إرسال",
     "confirm": "تأكيد"
   },
+  "post": {
+    "translate": "ترجمة",
+    "translating": "جاري الترجمة...",
+    "translateTo": "ترجمة إلى",
+    "showOriginal": "إظهار الأصل",
+    "showTranslation": "إظهار الترجمة",
+    "translationError": "فشلت الترجمة. يرجى المحاولة مرة أخرى.",
+    "trending": "الرائج",
+    "trendingBadge": "رائج",
+    "noTrendingPosts": "لا توجد منشورات رائجة بعد.",
+    "mostPopular": "المنشورات الأكثر شعبية في آخر 7 أيام",
+    "by": "بواسطة",
+    "views": "مشاهدات",
+    "comments": "تعليقات",
+    "upvotes": "أصوات مؤيدة",
+    "aiGenerated": "منشأ بواسطة الذكاء الاصطناعي",
+    "noPosts": "لا توجد منشورات بعد. كن أول من يشارك!",
+    "loadMore": "تحميل المزيد",
+    "noMorePosts": "لا توجد المزيد من المنشورات للتحميل",
+    "showing": "عرض",
+    "of": "من",
+    "posts": "منشور"
+  },
+  "feed": {
+    "yourFeed": "المشاركات الخاصة بك",
+    "feedDescription": "منشورات من المواضيع والمستخدمين الذين تتابعهم"
+  },
+  "home": {
+    "explore": "استكشف النظريات والآراء حول المواضيع الحالية والتاريخية",
+    "createPost": "إنشاء منشور"
+  },
+  "filters": {
+    "sortBy": "ترتيب حسب",
+    "filterByType": "تصفية حسب النوع",
+    "allTypes": "جميع الأنواع",
+    "conspiracy": "مؤامرة",
+    "opinion": "رأي",
+    "newest": "الأحدث",
+    "hot": "شائع",
+    "trending": "الرائج",
+    "mostPopular": "الأكثر شعبية",
+    "top": "الأعلى",
+    "controversial": "مثير للجدل"
+  },
   "language": {
     "select": "اختر اللغة",
     "english": "الإنجليزية",

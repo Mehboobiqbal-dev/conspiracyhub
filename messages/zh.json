@@ -32,6 +32,50 @@
     "submit": "提交",
     "confirm": "确认"
   },
+  "post": {
+    "translate": "翻译",
+    "translating": "翻译中...",
+    "translateTo": "翻译为",
+    "showOriginal": "显示原文",
+    "showTranslation": "显示翻译",
+    "translationError": "翻译失败。请重试。",
+    "trending": "热门",
+    "trendingBadge": "热门",
+    "noTrendingPosts": "还没有热门帖子。",
+    "mostPopular": "过去7天最受欢迎的帖子",
+    "by": "由",
+    "views": "次浏览",
+    "comments": "评论",
+    "upvotes": "赞成票",
+    "aiGenerated": "AI生成",
+    "noPosts": "还没有帖子。成为第一个分享的人！",
+    "loadMore": "加载更多",
+    "noMorePosts": "没有更多帖子可加载",
+    "showing": "显示",
+    "of": "共",
+    "posts": "个帖子"
+  },
+  "feed": {
+    "yourFeed": "您的动态",
+    "feedDescription": "来自您关注的话题和用户的帖子"
+  },
+  "home": {
+    "explore": "探索当前和历史主题的理论和观点",
+    "createPost": "创建帖子"
+  },
+  "filters": {
+    "sortBy": "排序方式",
+    "filterByType": "按类型筛选",
+    "allTypes": "所有类型",
+    "conspiracy": "阴谋论",
+    "opinion": "观点",
+    "newest": "最新",
+    "hot": "热门",
+    "trending": "趋势",
+    "mostPopular": "最受欢迎",
+    "top": "置顶",
+    "controversial": "争议"
+  },
   "language": {
     "select": "选择语言",
     "english": "英语",

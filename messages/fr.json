@@ -32,6 +32,50 @@
     "submit": "Soumettre",
     "confirm": "Confirmer"
   },
+  "post": {
+    "translate": "Traduire",
+    "translating": "Traduction en cours...",
+    "translateTo": "Traduire en",
+    "showOriginal": "Afficher l'original",
+    "showTranslation": "Afficher la traduction",
+    "translationError": "Échec de la traduction. Veuillez réessayer.",
+    "trending": "Tendances",
+    "trendingBadge": "Tendance",
+    "noTrendingPosts": "Aucune publication tendance pour le moment.",
+    "mostPopular": "Publications les plus populaires des 7 derniers jours",
+    "by": "par",
+    "views": "vues",
+    "comments": "Commentaires",
+    "upvotes": "Votes positifs",
+    "aiGenerated": "Généré par IA",
+    "noPosts": "Aucune publication pour le moment. Soyez le premier à partager !",
+    "loadMore": "Charger plus",
+    "noMorePosts": "Plus de publications à charger",
+    "showing": "Affichage",
+    "of": "de",
+    "posts": "publications"
+  },
+  "feed": {
+    "yourFeed": "Votre Fil",
+    "feedDescription": "Publications des sujets et utilisateurs que vous suivez"
+  },
+  "home": {
+    "explore": "Explorez les théories et opinions sur des sujets actuels et historiques",
+    "createPost": "Créer une publication"
+  },
+  "filters": {
+    "sortBy": "Trier par",
+    "filterByType": "Filtrer par type",
+    "allTypes": "Tous les types",
+    "conspiracy": "Complot",
+    "opinion": "Opinion",
+    "newest": "Plus récent",
+    "hot": "Populaire",
+    "trending": "Tendances",
+    "mostPopular": "Plus populaires",
+    "top": "Meilleurs",
+    "controversial": "Controversé"
+  },
   "language": {
     "select": "Sélectionner la langue",
     "english": "Anglais",

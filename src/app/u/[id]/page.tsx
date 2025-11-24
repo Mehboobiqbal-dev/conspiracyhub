@@ -14,38 +14,10 @@ import { Trophy, TrendingUp, MessageSquare, FileText } from 'lucide-react';
 import { UserFollowButton } from '@/components/user-follow-button';
 import { UserFollow } from '@/lib/models/user-follow';
 import { UserStats } from '@/lib/models/user-activity';
+import { getTextPreview } from '@/lib/utils/html';
 
 interface PageProps {
   params: Promise<{ id: string }>;
-}
-
-// Helper function: sanitize HTML but keep <p>, <br>, <img>
-function sanitizeHtml(html: string): string {
-  if (typeof html !== 'string') return '';
-  // Remove all tags except <p>, <br>, <img>
-  return html.replace(/<(?!\/?(p|br|img)(?=>|\s.*>))\/?.*?>/g, '').trim();
-}
-
-// Limit string length but preserve HTML tags
-function truncateHtml(html: string, maxLength: number): string {
-  const tempDiv = document.createElement('div');
-  tempDiv.innerHTML = html;
-  let text = '';
-  const traverse = (node: ChildNode) => {
-    if (text.length >= maxLength) return;
-    if (node.nodeType === Node.TEXT_NODE) {
-      text += node.textContent?.slice(0, maxLength - text.length) || '';
-    } else if (node.nodeType === Node.ELEMENT_NODE) {
-      const el = node as HTMLElement;
-      if (el.tagName === 'IMG') {
-        text += el.outerHTML;
-      } else {
-        el.childNodes.forEach(traverse);
-      }
-    }
-  };
-  tempDiv.childNodes.forEach(traverse);
-  return text;
 }
 
 async function getUserProfile(userId: string) {
@@ -217,12 +189,9 @@ export default async function UserProfilePage({ params }: PageProps) {
                           <CardTitle className="text-2xl hover:text-primary transition-colors cursor-pointer">{post.title}</CardTitle>
                         </Link>
                         {(post.excerpt || post.content) && (
-                          <CardDescription
-                            className="mt-2 line-clamp-3"
-                            dangerouslySetInnerHTML={{
-                              __html: truncateHtml(sanitizeHtml(post.excerpt || post.content || ''), 300),
-                            }}
-                          />
+                          <CardDescription className="mt-2 line-clamp-3">
+                            {getTextPreview(post.excerpt || post.content || '', 300)}
+                          </CardDescription>
                         )}
                       </div>
                     </div>

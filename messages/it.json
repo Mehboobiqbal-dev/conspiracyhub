@@ -32,6 +32,50 @@
     "submit": "Invia",
     "confirm": "Conferma"
   },
+  "post": {
+    "translate": "Traduci",
+    "translating": "Traduzione in corso...",
+    "translateTo": "Traduci in",
+    "showOriginal": "Mostra originale",
+    "showTranslation": "Mostra traduzione",
+    "translationError": "Traduzione fallita. Riprova.",
+    "trending": "Tendenze",
+    "trendingBadge": "Tendenza",
+    "noTrendingPosts": "Nessun post in tendenza ancora.",
+    "mostPopular": "Post più popolari negli ultimi 7 giorni",
+    "by": "di",
+    "views": "visualizzazioni",
+    "comments": "Commenti",
+    "upvotes": "Voti positivi",
+    "aiGenerated": "Generato da IA",
+    "noPosts": "Nessun post ancora. Sii il primo a condividere!",
+    "loadMore": "Carica altro",
+    "noMorePosts": "Nessun altro post da caricare",
+    "showing": "Mostrando",
+    "of": "di",
+    "posts": "post"
+  },
+  "feed": {
+    "yourFeed": "Il tuo Feed",
+    "feedDescription": "Post da argomenti e utenti che segui"
+  },
+  "home": {
+    "explore": "Esplora teorie e opinioni su argomenti attuali e storici",
+    "createPost": "Crea Post"
+  },
+  "filters": {
+    "sortBy": "Ordina per",
+    "filterByType": "Filtra per tipo",
+    "allTypes": "Tutti i tipi",
+    "conspiracy": "Cospirazione",
+    "opinion": "Opinione",
+    "newest": "Più recenti",
+    "hot": "Popolari",
+    "trending": "Tendenze",
+    "mostPopular": "Più popolari",
+    "top": "Top",
+    "controversial": "Controversi"
+  },
   "language": {
     "select": "Seleziona lingua",
     "english": "Inglese",

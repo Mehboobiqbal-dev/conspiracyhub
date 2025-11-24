@@ -32,6 +32,50 @@
     "submit": "Senden",
     "confirm": "Bestätigen"
   },
+  "post": {
+    "translate": "Übersetzen",
+    "translating": "Übersetze...",
+    "translateTo": "Übersetzen in",
+    "showOriginal": "Original anzeigen",
+    "showTranslation": "Übersetzung anzeigen",
+    "translationError": "Übersetzung fehlgeschlagen. Bitte versuchen Sie es erneut.",
+    "trending": "Trending",
+    "trendingBadge": "Trending",
+    "noTrendingPosts": "Noch keine Trending-Beiträge.",
+    "mostPopular": "Beliebteste Beiträge der letzten 7 Tage",
+    "by": "von",
+    "views": "Aufrufe",
+    "comments": "Kommentare",
+    "upvotes": "Upvotes",
+    "aiGenerated": "KI-generiert",
+    "noPosts": "Noch keine Beiträge. Seien Sie der Erste, der teilt!",
+    "loadMore": "Mehr laden",
+    "noMorePosts": "Keine weiteren Beiträge zum Laden",
+    "showing": "Zeige",
+    "of": "von",
+    "posts": "Beiträge"
+  },
+  "feed": {
+    "yourFeed": "Ihr Feed",
+    "feedDescription": "Beiträge von Themen und Benutzern, denen Sie folgen"
+  },
+  "home": {
+    "explore": "Erkunden Sie Theorien und Meinungen zu aktuellen und historischen Themen",
+    "createPost": "Beitrag erstellen"
+  },
+  "filters": {
+    "sortBy": "Sortieren nach",
+    "filterByType": "Nach Typ filtern",
+    "allTypes": "Alle Typen",
+    "conspiracy": "Verschwörung",
+    "opinion": "Meinung",
+    "newest": "Neueste",
+    "hot": "Beliebt",
+    "trending": "Trending",
+    "mostPopular": "Beliebteste",
+    "top": "Top",
+    "controversial": "Kontrovers"
+  },
   "language": {
     "select": "Sprache auswählen",
     "english": "Englisch",
