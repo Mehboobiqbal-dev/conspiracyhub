@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ArrowUp, MessageCircle, Eye, Clock, Loader2 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { getTextPreview } from '@/lib/utils/html';
+import { PostCard } from '@/components/post-card';
 
 interface Post {
   _id: string;
@@ -180,71 +181,7 @@ export function PostFeed({ initialPosts, feedType = 'public', topicSlug }: PostF
           </Card>
         ) : (
           posts.map((post) => (
-            <Card key={post._id} className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Badge variant={post.type === 'conspiracy' ? 'destructive' : 'default'}>
-                        {post.type}
-                      </Badge>
-                      {post.isAIGenerated && (
-                        <Badge variant="secondary">AI Generated</Badge>
-                      )}
-                      {post.topicSlug && (
-                        <Link href={`/t/${post.topicSlug}`}>
-                          <Badge variant="outline" className="hover:bg-accent cursor-pointer">
-                            {post.topicSlug}
-                          </Badge>
-                        </Link>
-                      )}
-                    </div>
-                    <Link href={`/p/${post.slug}`}>
-                      <CardTitle className="text-2xl hover:text-primary transition-colors cursor-pointer">
-                        {post.title}
-                      </CardTitle>
-                    </Link>
-                    {(post.excerpt || post.content) && (
-                      <CardDescription className="mt-2 line-clamp-2">
-                        {getTextPreview(post.excerpt || post.content || '', 200)}
-                      </CardDescription>
-                    )}
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center gap-6 text-sm text-muted-foreground">
-                  <div className="flex items-center gap-1">
-                    <ArrowUp className="h-4 w-4" />
-                    <span>{post.upvotes}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <MessageCircle className="h-4 w-4" />
-                    <span>{post.commentCount}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Eye className="h-4 w-4" />
-                    <span>{post.views}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Clock className="h-4 w-4" />
-                    <span>{formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}</span>
-                  </div>
-                  {post.authorName && (
-                    <span>by {post.authorName}</span>
-                  )}
-                </div>
-                {post.tags && post.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mt-4">
-                    {post.tags.map((tag, idx) => (
-                      <Badge key={idx} variant="outline" className="text-xs">
-                        {tag}
-                      </Badge>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+            <PostCard key={post._id} post={post} />
           ))
         )}
       </div>

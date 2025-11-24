@@ -149,12 +149,12 @@ export default async function PostPage({ params }: PageProps) {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="full-screen bg-background">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <div className="container mx-auto">
         {/* Breadcrumb */}
         <nav className="mb-6 text-sm text-muted-foreground">
           <Link href="/" className="hover:text-foreground">Home</Link>

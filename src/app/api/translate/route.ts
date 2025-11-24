@@ -5,20 +5,48 @@ import { NextRequest, NextResponse } from 'next/server';
 const LIBRETRANSLATE_API = 'https://libretranslate.com/translate';
 
 export async function POST(request: NextRequest) {
-  try {
-    const { text, source, target } = await request.json();
+  let body: any;
+  let originalText = '';
 
-    if (!text || !source || !target) {
+  try {
+    body = await request.json();
+    const { text, source, target, targetLanguage } = body;
+    originalText = text || '';
+
+    // Support both old format (source/target) and new format (targetLanguage)
+    const targetLang = target || targetLanguage || 'en';
+    const sourceLang = source || 'auto'; // Auto-detect source language
+
+    if (!text || !targetLang) {
       return NextResponse.json(
-        { error: 'Missing required parameters' },
+        { error: 'Missing required parameters: text and targetLanguage are required' },
         { status: 400 }
       );
     }
 
     // If source and target are the same, return original text
-    if (source === target) {
+    if (sourceLang !== 'auto' && sourceLang === targetLang) {
       return NextResponse.json({ translatedText: text });
     }
+
+    // Map locale codes to LibreTranslate language codes
+    const languageMap: Record<string, string> = {
+      'en': 'en',
+      'es': 'es',
+      'fr': 'fr',
+      'de': 'de',
+      'it': 'it',
+      'pt': 'pt',
+      'ru': 'ru',
+      'zh': 'zh',
+      'ja': 'ja',
+      'ar': 'ar',
+      'hi': 'hi',
+      'ko': 'ko',
+    };
+
+    const targetCode = languageMap[targetLang] || 'en';
+    const sourceCode = sourceLang === 'auto' ? 'auto' : (languageMap[sourceLang] || 'auto');
 
     // Use LibreTranslate API (free, no API key required)
     const response = await fetch(LIBRETRANSLATE_API, {
@@ -28,16 +56,16 @@ export async function POST(request: NextRequest) {
       },
       body: JSON.stringify({
         q: text,
-        source: source,
-        target: target,
+        source: sourceCode,
+        target: targetCode,
         format: 'html', // Preserve HTML formatting
       }),
     });
 
     if (!response.ok) {
-      // Fallback: Try Google Translate API (requires API key in env)
-      // Or return error
-      throw new Error('Translation service unavailable');
+      const errorText = await response.text();
+      console.error('LibreTranslate API error:', response.status, errorText);
+      throw new Error(`Translation service unavailable: ${response.status}`);
     }
 
     const data = await response.json();
@@ -46,11 +74,10 @@ export async function POST(request: NextRequest) {
     console.error('Translation error:', error);
     
     // Fallback: Return original text if translation fails
-    const { text } = await request.json();
     return NextResponse.json(
       { 
-        error: 'Translation service unavailable',
-        translatedText: text // Return original as fallback
+        error: error instanceof Error ? error.message : 'Translation service unavailable',
+        translatedText: originalText // Return original as fallback
       },
       { status: 500 }
     );

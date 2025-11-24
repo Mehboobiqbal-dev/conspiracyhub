@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -15,13 +15,14 @@ interface Post {
   _id: string;
   title: string;
   slug: string;
-  content?: string;
+  content: string;
   excerpt?: string;
   type: 'conspiracy' | 'opinion';
   upvotes: number;
+  downvotes?: number;
   commentCount: number;
   views: number;
-  createdAt: string;
+  createdAt: Date | string;
   authorName?: string;
   topicSlug?: string;
   tags?: string[];
@@ -35,6 +36,7 @@ interface PostCardProps {
 export function PostCard({ post }: PostCardProps) {
   const t = useTranslations('post');
   const tCommon = useTranslations('common');
+  const locale = useLocale();
   const [translatedContent, setTranslatedContent] = useState<string | null>(null);
   const [isTranslating, setIsTranslating] = useState(false);
   const [showOriginal, setShowOriginal] = useState(true);
@@ -49,6 +51,11 @@ export function PostCard({ post }: PostCardProps) {
     setIsTranslating(true);
     try {
       const fullContent = post.content || post.excerpt || '';
+      
+      if (!fullContent || fullContent.trim().length === 0) {
+        throw new Error('No content to translate');
+      }
+
       const response = await fetch('/api/translate', {
         method: 'POST',
         headers: {
@@ -56,24 +63,37 @@ export function PostCard({ post }: PostCardProps) {
         },
         body: JSON.stringify({
           text: fullContent,
-          targetLanguage: 'en', // You can get this from locale context
+          targetLanguage: locale, // Use current locale
         }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error('Translation failed');
+        // If API returns error but includes translatedText as fallback, use it
+        if (data.translatedText) {
+          setTranslatedContent(data.translatedText);
+          setShowOriginal(false);
+          setShowFullContent(true);
+          return;
+        }
+        throw new Error(data.error || 'Translation failed');
       }
 
-      const data = await response.json();
-      setTranslatedContent(data.translatedText);
-      setShowOriginal(false);
-      setShowFullContent(true);
+      if (data.translatedText) {
+        setTranslatedContent(data.translatedText);
+        setShowOriginal(false);
+        setShowFullContent(true);
+      } else {
+        throw new Error('No translation received');
+      }
     } catch (error) {
       console.error('Translation error:', error);
       Swal.fire({
         icon: 'error',
         title: t('translationError'),
         text: error instanceof Error ? error.message : 'Unknown error',
+        confirmButtonText: tCommon('close'),
       });
     } finally {
       setIsTranslating(false);
@@ -177,7 +197,7 @@ export function PostCard({ post }: PostCardProps) {
           </div>
           <div className="flex items-center gap-1">
             <Clock className="h-4 w-4" />
-            <span>{formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}</span>
+            <span>{formatDistanceToNow(post.createdAt instanceof Date ? post.createdAt : new Date(post.createdAt), { addSuffix: true })}</span>
           </div>
           {post.authorName && (
             <span>{t('by')} {post.authorName}</span>
