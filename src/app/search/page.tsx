@@ -30,7 +30,7 @@ interface SearchPageProps {
 export async function generateMetadata({ searchParams }: SearchPageProps): Promise<Metadata> {
   const query = searchParams.q || '';
   return {
-    title: query ? `Search: ${query} | ConspiracyHub` : 'Search | ConspiracyHub',
+    title: query ? `Search: ${query} | Elch` : 'Search | Elch',
     description: `Search results for "${query}"`,
   };
 }
@@ -163,7 +163,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       ? await searchTopics(query)
       : [];
 
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://conspiracyhub.com';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://Elch.com';
 
   // Structured data for search results
   const structuredData = query ? {

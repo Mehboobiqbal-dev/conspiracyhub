@@ -70,7 +70,7 @@ export function PostActions({ postId, postSlug }: PostActionsProps) {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'Check out this post on ConspiracyHub',
+          title: 'Check out this post on Elch',
           url,
         });
       } catch (error) {

@@ -5,7 +5,7 @@ import { verifyAccessToken } from '@/lib/auth/jwt';
 import { NotificationsList } from '@/components/notifications-list';
 
 export const metadata: Metadata = {
-  title: 'Notifications - ConspiracyHub',
+  title: 'Notifications - Elch',
   description: 'View all your notifications',
 };
 

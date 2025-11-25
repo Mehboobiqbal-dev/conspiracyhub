@@ -4,7 +4,7 @@ import { Post } from '@/lib/models/post';
 import { TrendingContent } from '@/components/trending-content';
 
 export const metadata: Metadata = {
-  title: 'Trending Posts | ConspiracyHub',
+  title: 'Trending Posts | Elch',
   description: 'Most popular and trending conspiracy theories and opinions',
 };
 

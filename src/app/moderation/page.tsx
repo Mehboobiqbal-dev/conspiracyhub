@@ -5,7 +5,7 @@ import { verifyAccessToken } from '@/lib/auth/jwt';
 import { ModerationQueue } from '@/components/moderation-queue';
 
 export const metadata: Metadata = {
-  title: 'Moderation Queue - ConspiracyHub',
+  title: 'Moderation Queue - Elch',
   description: 'Review and moderate reported content',
 };
 

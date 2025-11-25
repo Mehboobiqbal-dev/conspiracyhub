@@ -12,7 +12,7 @@ import { UserFollowButton } from '@/components/user-follow-button';
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
   return {
-    title: `Following - User Profile | ConspiracyHub`,
+    title: `Following - User Profile | Elch`,
   };
 }
 

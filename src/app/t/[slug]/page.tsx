@@ -63,7 +63,7 @@ export default async function TopicPage({ params }: PageProps) {
   }
 
   const { topic } = data;
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://conspiracyhub.com';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://Elch.com';
 
   // Structured data for SEO
   const structuredData = {

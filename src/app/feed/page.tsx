@@ -6,10 +6,10 @@ import { FeedHeader } from '@/components/feed-header';
 import { redirect } from 'next/navigation';
 
 export const metadata: Metadata = {
-  title: 'Your Feed - ConspiracyHub',
+  title: 'Your Feed - Elch',
   description: 'Personalized feed based on your followed topics and users',
   openGraph: {
-    title: 'Your Feed - ConspiracyHub',
+    title: 'Your Feed - Elch',
     description: 'Personalized feed based on your followed topics and users',
     type: 'website',
   },

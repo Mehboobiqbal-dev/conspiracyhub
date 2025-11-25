@@ -3,30 +3,30 @@ import { PostFeed } from '@/components/post-feed';
 import { HomeHeader } from '@/components/home-header';
 
 export const metadata: Metadata = {
-  title: 'ConspiracyHub - Latest Conspiracy Theories & Opinions',
+  title: 'Elch - Latest Conspiracy Theories & Opinions',
   description: 'Explore conspiracy theories and opinions on current and historical topics. AI-generated and user-submitted content. Read without login, share your theories and opinions.',
   keywords: ['conspiracy theories', 'opinions', 'debate', 'discussion', 'current events', 'history', 'AI generated content'],
   openGraph: {
-    title: 'ConspiracyHub - Conspiracy Theories & Opinions Platform',
+    title: 'Elch - Conspiracy Theories & Opinions Platform',
     description: 'Explore conspiracy theories and opinions on current and historical topics. AI-generated and user-submitted content.',
     type: 'website',
-    siteName: 'ConspiracyHub',
+    siteName: 'Elch',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'ConspiracyHub',
+    title: 'Elch',
     description: 'Explore conspiracy theories and opinions on current and historical topics.',
   },
 };
 
 export default async function HomePage() {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://conspiracyhub.com';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://Elch.com';
 
   // Structured data for SEO
   const structuredData = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: 'ConspiracyHub',
+    name: 'Elch',
     description: 'Explore conspiracy theories and opinions on current and historical topics. AI-generated and user-submitted content.',
     url: baseUrl,
     potentialAction: {

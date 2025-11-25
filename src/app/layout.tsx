@@ -13,13 +13,13 @@ import { ReduxProvider } from '@/store/provider';
 
 
 export const metadata: Metadata = {
-  title: 'ConspiracyHub - Conspiracy Theories & Opinions Platform',
+  title: 'Elch - Conspiracy Theories & Opinions Platform',
   description: 'Explore conspiracy theories and opinions on current and historical topics. AI-generated and user-submitted content.',
   keywords: ['conspiracy theories', 'opinions', 'debate', 'discussion', 'current events', 'history'],
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    siteName: 'ConspiracyHub',
+    siteName: 'Elch',
   },
   twitter: {
     card: 'summary_large_image',

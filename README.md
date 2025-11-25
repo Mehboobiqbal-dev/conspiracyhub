@@ -1,4 +1,4 @@
-# ConspiracyHub - Conspiracy & Opinion Platform
+# Elch - Conspiracy & Opinion Platform
 
 A Reddit/Quora-style platform focused on conspiracy theories and opinions, powered by AI-generated content and user submissions.
 

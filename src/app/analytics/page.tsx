@@ -5,7 +5,7 @@ import { verifyAccessToken } from '@/lib/auth/jwt';
 import { AnalyticsDashboard } from '@/components/analytics-dashboard';
 
 export const metadata: Metadata = {
-  title: 'Community Analytics - ConspiracyHub',
+  title: 'Community Analytics - Elch',
   description: 'View community statistics and insights',
 };
 

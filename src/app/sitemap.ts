@@ -4,7 +4,7 @@ import { Post } from '@/lib/models/post';
 import { Topic } from '@/lib/models/topic';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://conspiracyhub.com';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://Elch.com';
 
   const sitemap: MetadataRoute.Sitemap = [
     {

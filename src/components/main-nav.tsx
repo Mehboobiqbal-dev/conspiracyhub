@@ -118,8 +118,8 @@ export function MainNav() {
             </Sheet>
             <Link href="/" className="flex items-center gap-2">
               <span className="font-headline text-xl font-bold flex items-center gap-2">
-                <img src="/favicon-16x16.png" alt="ConspiracyHub Logo" width={24} height={24} className="inline-block" />
-                ConspiracyHub
+                <img src="/favicon-16x16.png" alt="Elch Logo" width={24} height={24} className="inline-block" />
+                Elch
               </span>
             </Link>
             <div className="hidden lg:flex items-center gap-4">
