@@ -97,10 +97,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const { post } = data;
   
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://conspiracyhub.com';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://Elch.com';
   
   return {
-    title: `${post.title} | ConspiracyHub`,
+    title: `${post.title} | Elch`,
     description: post.excerpt || post.content.substring(0, 160),
     openGraph: {
       title: post.title,
@@ -127,7 +127,7 @@ export default async function PostPage({ params }: PageProps) {
 
   const { post, topic, author, comments } = data;
 
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://conspiracyhub.com';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://Elch.com';
 
   // Structured data for SEO
   const structuredData = {

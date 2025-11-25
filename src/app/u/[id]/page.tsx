@@ -79,7 +79,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!id || id === 'undefined') return { title: 'User Not Found' };
   const data = await getUserProfile(id);
   if (!data) return { title: 'User Not Found' };
-  return { title: `${data.user.name} | ConspiracyHub`, description: data.user.bio || `Posts by ${data.user.name}` };
+  return { title: `${data.user.name} | Elch`, description: data.user.bio || `Posts by ${data.user.name}` };
 }
 
 export default async function UserProfilePage({ params }: PageProps) {
