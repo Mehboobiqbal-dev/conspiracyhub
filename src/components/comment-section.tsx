@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import Swal from 'sweetalert2';
 import { useAuth } from '@/contexts/auth-context';
 import { authenticatedFetch } from '@/lib/auth/fetch';
 import { Button } from '@/components/ui/button';
@@ -172,8 +173,29 @@ export function CommentSection({ postId, postSlug }: CommentSectionProps) {
     setAttachmentUploading(true);
     try {
       const result = await uploadMedia(file, 'image');
-      const altText = window.prompt('Alt text for accessibility (optional)') || undefined;
-      const caption = window.prompt('Caption (optional)') || undefined;
+      const captionResult = await Swal.fire({
+        title: 'Add Caption',
+        input: 'text',
+        inputLabel: 'Caption (optional)',
+        inputPlaceholder: 'Enter a caption for this image',
+        showCancelButton: true,
+        confirmButtonText: 'Next',
+        cancelButtonText: 'Skip',
+        allowOutsideClick: false,
+      });
+      const caption = captionResult.value || undefined;
+
+      const altResult = await Swal.fire({
+        title: 'Add Alt Text',
+        input: 'text',
+        inputLabel: 'Alt text for accessibility (optional)',
+        inputPlaceholder: 'Describe the image for screen readers',
+        showCancelButton: true,
+        confirmButtonText: 'Done',
+        cancelButtonText: 'Skip',
+        allowOutsideClick: false,
+      });
+      const altText = altResult.value || undefined;
       setAttachment({
         url: result.url,
         type: 'image',
