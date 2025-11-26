@@ -43,28 +43,9 @@ async function handler(request: NextRequest) {
     console.log('[votes] existingVote', existingVote);
 
     if (existingVote) {
-      // If same vote type, remove it (toggle off)
+      // If same vote type, do nothing (keep the vote)
       if (existingVote.type === validated.type) {
-        await votesCollection.deleteOne({ _id: existingVote._id });
-
-        // Decrement vote count
-        if (validated.postId) {
-          const postsCollection = await getCollection<Post>('posts');
-          const res = await postsCollection.updateOne(
-            { _id: new ObjectId(validated.postId) },
-            { $inc: { [validated.type === 'upvote' ? 'upvotes' : 'downvotes']: -1 } }
-          );
-          console.log('[votes] post decrement result', res.modifiedCount);
-        } else if (validated.commentId) {
-          const commentsCollection = await getCollection<Comment>('comments');
-          const res = await commentsCollection.updateOne(
-            { _id: new ObjectId(validated.commentId!) },
-            { $inc: { [validated.type === 'upvote' ? 'upvotes' : 'downvotes']: -1 } }
-          );
-          console.log('[votes] comment decrement result', res.modifiedCount);
-        }
-
-        return NextResponse.json({ message: 'Vote removed', voted: false });
+        return NextResponse.json({ message: 'Vote already exists', voted: true, type: existingVote.type });
       } else {
         // Change vote type
         await votesCollection.updateOne(
