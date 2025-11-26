@@ -9,9 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowUp, MessageCircle, Eye, Clock } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
-import { getTextPreview } from '@/lib/utils/html';
+import { SearchPostCard } from '@/components/search-post-card';
 
 type SearchType = 'all' | 'posts' | 'topics';
 
@@ -327,57 +325,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
               ) : (
                 <div className="space-y-4">
                   {posts.map((post) => (
-                    <Card key={post._id} className="hover:shadow-lg transition-shadow">
-                      <CardHeader>
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
-                              <Badge variant={post.type === 'conspiracy' ? 'destructive' : 'default'}>
-                                {post.type}
-                              </Badge>
-                              {post.isAIGenerated && (
-                                <Badge variant="secondary">AI Generated</Badge>
-                              )}
-                              {post.topicSlug && (
-                                <Link href={`/t/${post.topicSlug}`}>
-                                  <Badge variant="outline">{post.topicSlug}</Badge>
-                                </Link>
-                              )}
-                            </div>
-                            <Link href={`/p/${post.slug}`}>
-                              <CardTitle className="text-2xl hover:text-primary transition-colors cursor-pointer">
-                                {post.title}
-                              </CardTitle>
-                            </Link>
-                            {(post.excerpt || post.content) && (
-                              <CardDescription className="mt-2 line-clamp-2">
-                                {getTextPreview(post.excerpt || post.content || '', 200)}
-                              </CardDescription>
-                            )}
-                          </div>
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="flex items-center gap-6 text-sm text-muted-foreground">
-                          <div className="flex items-center gap-1">
-                            <ArrowUp className="h-4 w-4" />
-                            <span>{post.upvotes}</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <MessageCircle className="h-4 w-4" />
-                            <span>{post.commentCount}</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Eye className="h-4 w-4" />
-                            <span>{post.views}</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Clock className="h-4 w-4" />
-                            <span>{formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}</span>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
+                    <SearchPostCard key={post._id} post={post} />
                   ))}
                 </div>
               )}

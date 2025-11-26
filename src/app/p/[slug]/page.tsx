@@ -9,7 +9,8 @@ import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ArrowUp, MessageCircle, Eye, Clock, User as UserIcon } from 'lucide-react';
+import { ArrowUp, Eye, Clock, User as UserIcon } from 'lucide-react';
+import { CommentModalButton } from '@/components/comment-modal-button';
 import { CommentSection } from '@/components/comment-section';
 import { PostVoteButtons } from '@/components/post-vote-buttons';
 import { PostActions } from '@/components/post-actions';
@@ -229,10 +230,11 @@ export default async function PostPage({ params }: PageProps) {
                     initialUpvotes={post.upvotes}
                     initialDownvotes={post.downvotes}
                   />
-                  <Button variant="outline" size="sm" disabled>
-                    <MessageCircle className="h-4 w-4 mr-1" />
-                    {post.commentCount} Comments
-                  </Button>
+                  <CommentModalButton
+                    postId={post._id}
+                    postSlug={post.slug}
+                    commentCount={post.commentCount}
+                  />
                 </div>
                 <PostActions postId={post._id} postSlug={post.slug} />
               </div>
@@ -250,7 +252,7 @@ export default async function PostPage({ params }: PageProps) {
           </Card>
 
           {/* Comments Section */}
-          <Card>
+          <Card id="comments">
             <CardContent className="pt-6">
               <CommentSection postId={post._id} postSlug={post.slug} />
             </CardContent>

@@ -6,10 +6,13 @@ import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ArrowUp, MessageCircle, Eye, Clock, Languages, Loader2 } from 'lucide-react';
+import { Eye, Clock, Languages, Loader2 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { getTextPreview } from '@/lib/utils/html';
 import Swal from 'sweetalert2';
+import { CommentCountButton } from '@/components/comment-count-button';
+import { CommentSection } from '@/components/comment-section';
+import { PostVoteButtons } from '@/components/post-vote-buttons';
 
 interface Post {
   _id: string;
@@ -41,6 +44,7 @@ export function PostCard({ post }: PostCardProps) {
   const [isTranslating, setIsTranslating] = useState(false);
   const [showOriginal, setShowOriginal] = useState(true);
   const [showFullContent, setShowFullContent] = useState(false);
+  const [showComments, setShowComments] = useState(false);
 
   const handleTranslate = async () => {
     if (translatedContent) {
@@ -183,14 +187,19 @@ export function PostCard({ post }: PostCardProps) {
       </CardHeader>
       <CardContent>
         <div className="flex items-center gap-6 text-sm text-muted-foreground">
-          <div className="flex items-center gap-1">
-            <ArrowUp className="h-4 w-4" />
-            <span>{post.upvotes}</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <MessageCircle className="h-4 w-4" />
-            <span>{post.commentCount}</span>
-          </div>
+          <PostVoteButtons
+            postId={post._id}
+            postSlug={post.slug}
+            initialUpvotes={post.upvotes}
+            initialDownvotes={post.downvotes ?? 0}
+          />
+          <CommentCountButton
+            postId={post._id}
+            postSlug={post.slug}
+            commentCount={post.commentCount}
+            className="text-sm text-muted-foreground"
+            onClick={() => setShowComments((prev) => !prev)}
+          />
           <div className="flex items-center gap-1">
             <Eye className="h-4 w-4" />
             <span>{post.views}</span>
@@ -210,6 +219,12 @@ export function PostCard({ post }: PostCardProps) {
                 {tag}
               </Badge>
             ))}
+          </div>
+        )}
+
+        {showComments && (
+          <div className="mt-4 border-t pt-4">
+            <CommentSection postId={post._id} postSlug={post.slug} />
           </div>
         )}
       </CardContent>
