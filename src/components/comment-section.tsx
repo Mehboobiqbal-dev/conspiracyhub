@@ -108,12 +108,18 @@ export function CommentSection({ postId, postSlug }: CommentSectionProps) {
     e.preventDefault();
 
     if (!user) {
-      toast({
-        title: 'Authentication Required',
-        description: 'Please log in to comment',
-        variant: 'destructive',
+      const result = await Swal.fire({
+        title: 'Login required',
+        text: 'You need to log in to post a comment.',
+        icon: 'info',
+        showCancelButton: true,
+        confirmButtonText: 'Login',
+        cancelButtonText: 'Cancel',
       });
-      router.push(`/login?redirect=/p/${postSlug}`);
+
+      if (result.isConfirmed) {
+        router.push(`/login?redirect=/p/${postSlug}`);
+      }
       return;
     }
 
@@ -228,11 +234,18 @@ export function CommentSection({ postId, postSlug }: CommentSectionProps) {
 
   const handleVote = async (commentId: string, type: 'upvote' | 'downvote') => {
     if (!user) {
-      toast({
-        title: 'Authentication Required',
-        description: 'Please log in to vote',
-        variant: 'destructive',
+      const result = await Swal.fire({
+        title: 'Login required',
+        text: 'You need to log in to vote on comments.',
+        icon: 'info',
+        showCancelButton: true,
+        confirmButtonText: 'Login',
+        cancelButtonText: 'Cancel',
       });
+
+      if (result.isConfirmed) {
+        router.push(`/login?redirect=/p/${postSlug}`);
+      }
       return;
     }
 

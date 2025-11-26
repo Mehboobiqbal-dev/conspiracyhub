@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Swal from 'sweetalert2';
 import { useAuth } from '@/contexts/auth-context';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -47,12 +48,18 @@ export function PostVoteButtons({
 
   const handleVote = async (type: 'upvote' | 'downvote') => {
     if (!user) {
-      toast({
-        title: 'Authentication Required',
-        description: 'Please log in to vote',
-        variant: 'destructive',
+      const result = await Swal.fire({
+        title: 'Login required',
+        text: 'You need to log in to vote on posts.',
+        icon: 'info',
+        showCancelButton: true,
+        confirmButtonText: 'Login',
+        cancelButtonText: 'Cancel',
       });
-      router.push(`/login?redirect=/p/${postSlug}`);
+
+      if (result.isConfirmed) {
+        router.push(`/login?redirect=/p/${postSlug}`);
+      }
       return;
     }
 
@@ -125,7 +132,7 @@ export function PostVoteButtons({
         variant="outline"
         size="sm"
         onClick={() => handleVote('upvote')}
-        disabled={!user || loading}
+        disabled={loading}
         className={cn(
           userVote === 'upvote' && 'bg-primary text-primary-foreground'
         )}
@@ -140,7 +147,7 @@ export function PostVoteButtons({
         variant="outline"
         size="sm"
         onClick={() => handleVote('downvote')}
-        disabled={!user || loading}
+        disabled={loading}
         className={cn(
           userVote === 'downvote' && 'bg-destructive text-destructive-foreground'
         )}
