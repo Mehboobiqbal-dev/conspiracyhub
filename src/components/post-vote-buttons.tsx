@@ -38,6 +38,13 @@ export function PostVoteButtons({
       })
         .then(res => res.json())
         .then(data => {
+          // Sync counts from server so they persist across refresh
+          if (typeof data.upvotes === 'number') {
+            setUpvotes(data.upvotes);
+          }
+          if (typeof data.downvotes === 'number') {
+            setDownvotes(data.downvotes);
+          }
           if (data.userVote) {
             setUserVote(data.userVote);
           }
@@ -79,6 +86,12 @@ export function PostVoteButtons({
       });
 
       const data = await response.json();
+      console.log('[PostVoteButtons] vote response', {
+        postId,
+        type,
+        status: response.status,
+        data,
+      });
 
       if (response.ok) {
         // Update vote state

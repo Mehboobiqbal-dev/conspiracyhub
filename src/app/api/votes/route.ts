@@ -5,6 +5,7 @@ import { Vote } from '@/lib/models/vote';
 import { Post } from '@/lib/models/post';
 import { Comment } from '@/lib/models/comment';
 import { z } from 'zod';
+import { ObjectId } from 'mongodb';
 
 const voteSchema = z.object({
   postId: z.string().optional(),
@@ -17,6 +18,12 @@ async function handler(request: NextRequest) {
     const body = await request.json();
     const validated = voteSchema.parse(body);
     const userId = (request as any).user.userId;
+
+    console.log('[votes] incoming', {
+      body,
+      validated,
+      userId,
+    });
 
     if (!validated.postId && !validated.commentId) {
       return NextResponse.json(
@@ -33,6 +40,8 @@ async function handler(request: NextRequest) {
       ...(validated.postId ? { postId: validated.postId as any } : { commentId: validated.commentId as any }),
     });
 
+    console.log('[votes] existingVote', existingVote);
+
     if (existingVote) {
       // If same vote type, remove it (toggle off)
       if (existingVote.type === validated.type) {
@@ -41,16 +50,18 @@ async function handler(request: NextRequest) {
         // Decrement vote count
         if (validated.postId) {
           const postsCollection = await getCollection<Post>('posts');
-          await postsCollection.updateOne(
-            { _id: validated.postId as any },
+          const res = await postsCollection.updateOne(
+            { _id: new ObjectId(validated.postId) },
             { $inc: { [validated.type === 'upvote' ? 'upvotes' : 'downvotes']: -1 } }
           );
+          console.log('[votes] post decrement result', res.modifiedCount);
         } else if (validated.commentId) {
           const commentsCollection = await getCollection<Comment>('comments');
-          await commentsCollection.updateOne(
-            { _id: validated.commentId as any },
+          const res = await commentsCollection.updateOne(
+            { _id: new ObjectId(validated.commentId!) },
             { $inc: { [validated.type === 'upvote' ? 'upvotes' : 'downvotes']: -1 } }
           );
+          console.log('[votes] comment decrement result', res.modifiedCount);
         }
 
         return NextResponse.json({ message: 'Vote removed', voted: false });
@@ -64,8 +75,8 @@ async function handler(request: NextRequest) {
         // Update vote counts
         if (validated.postId) {
           const postsCollection = await getCollection<Post>('posts');
-          await postsCollection.updateOne(
-            { _id: validated.postId as any },
+          const res = await postsCollection.updateOne(
+            { _id: new ObjectId(validated.postId) },
             {
               $inc: {
                 [existingVote.type === 'upvote' ? 'upvotes' : 'downvotes']: -1,
@@ -73,10 +84,11 @@ async function handler(request: NextRequest) {
               },
             }
           );
+          console.log('[votes] post change result', res.modifiedCount);
         } else if (validated.commentId) {
           const commentsCollection = await getCollection<Comment>('comments');
-          await commentsCollection.updateOne(
-            { _id: validated.commentId as any },
+          const res = await commentsCollection.updateOne(
+            { _id: new ObjectId(validated.commentId!) },
             {
               $inc: {
                 [existingVote.type === 'upvote' ? 'upvotes' : 'downvotes']: -1,
@@ -84,6 +96,7 @@ async function handler(request: NextRequest) {
               },
             }
           );
+          console.log('[votes] comment change result', res.modifiedCount);
         }
 
         return NextResponse.json({ message: 'Vote updated', voted: true, type: validated.type });
@@ -99,21 +112,24 @@ async function handler(request: NextRequest) {
       createdAt: new Date(),
     };
 
-    await votesCollection.insertOne(newVote as Vote);
+    const insertRes = await votesCollection.insertOne(newVote as Vote);
+    console.log('[votes] newVote inserted', insertRes.insertedId?.toString());
 
     // Increment vote count
     if (validated.postId) {
       const postsCollection = await getCollection<Post>('posts');
-      await postsCollection.updateOne(
-        { _id: validated.postId as any },
+      const res = await postsCollection.updateOne(
+        { _id: new ObjectId(validated.postId) },
         { $inc: { [validated.type === 'upvote' ? 'upvotes' : 'downvotes']: 1 } }
       );
+      console.log('[votes] post increment result', res.modifiedCount);
     } else if (validated.commentId) {
       const commentsCollection = await getCollection<Comment>('comments');
-      await commentsCollection.updateOne(
-        { _id: validated.commentId as any },
+      const res = await commentsCollection.updateOne(
+        { _id: new ObjectId(validated.commentId!) },
         { $inc: { [validated.type === 'upvote' ? 'upvotes' : 'downvotes']: 1 } }
       );
+      console.log('[votes] comment increment result', res.modifiedCount);
     }
 
     return NextResponse.json({ message: 'Vote recorded', voted: true, type: validated.type });
