@@ -34,13 +34,13 @@ export function TrendingContent({ posts }: TrendingContentProps) {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
-        <div className="mb-8">
+      <div className="container mx-auto px-4 py-6 sm:py-8 max-w-6xl">
+        <div className="mb-6 sm:mb-8">
           <div className="flex items-center gap-2 mb-2">
-            <TrendingUp className="h-8 w-8 text-primary" />
-            <h1 className="text-4xl font-headline font-bold">{t('trending')}</h1>
+            <TrendingUp className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-headline font-bold">{t('trending')}</h1>
           </div>
-          <p className="text-muted-foreground text-lg">
+          <p className="text-muted-foreground text-base sm:text-lg">
             {t('mostPopular')}
           </p>
         </div>
@@ -75,7 +75,7 @@ export function TrendingContent({ posts }: TrendingContentProps) {
                         )}
                       </div>
                       <Link href={`/p/${post.slug}`}>
-                        <CardTitle className="text-2xl hover:text-primary transition-colors cursor-pointer">
+                        <CardTitle className="text-lg sm:text-xl md:text-2xl hover:text-primary transition-colors cursor-pointer break-words">
                           {post.title}
                         </CardTitle>
                       </Link>
@@ -88,25 +88,25 @@ export function TrendingContent({ posts }: TrendingContentProps) {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex items-center gap-6 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-3 sm:gap-6 text-sm text-muted-foreground flex-wrap">
                     <div className="flex items-center gap-1">
-                      <ArrowUp className="h-4 w-4" />
-                      <span>{post.upvotes}</span>
+                      <ArrowUp className="h-4 w-4 shrink-0" />
+                      <span className="whitespace-nowrap">{post.upvotes}</span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <MessageCircle className="h-4 w-4" />
-                      <span>{post.commentCount}</span>
+                      <MessageCircle className="h-4 w-4 shrink-0" />
+                      <span className="whitespace-nowrap">{post.commentCount}</span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <Eye className="h-4 w-4" />
-                      <span>{post.views} {t('views')}</span>
+                      <Eye className="h-4 w-4 shrink-0" />
+                      <span className="whitespace-nowrap">{post.views} {t('views')}</span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <Clock className="h-4 w-4" />
-                      <span>{formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}</span>
+                      <Clock className="h-4 w-4 shrink-0" />
+                      <span className="whitespace-nowrap">{formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}</span>
                     </div>
                     {post.authorName && (
-                      <span>{t('by')} {post.authorName}</span>
+                      <span className="hidden sm:inline whitespace-nowrap">{t('by')} {post.authorName}</span>
                     )}
                   </div>
                   {post.tags && post.tags.length > 0 && (

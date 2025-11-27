@@ -125,24 +125,27 @@ export function PostActions({ postId, postSlug }: PostActionsProps) {
   };
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-1 sm:gap-2">
       <Button
         variant="ghost"
         size="sm"
         onClick={handleSave}
         disabled={!user || loading}
-        className={cn(saved && 'bg-primary/10')}
+        className={cn(
+          saved && 'bg-primary/10',
+          'h-8 sm:h-9 px-2 sm:px-3'
+        )}
       >
-        <Bookmark className={cn('h-4 w-4 mr-1', saved && 'fill-current')} />
-        {saved ? 'Saved' : 'Save'}
+        <Bookmark className={cn('h-3.5 w-3.5 sm:h-4 sm:w-4 mr-0.5 sm:mr-1', saved && 'fill-current')} />
+        <span className="hidden sm:inline text-xs sm:text-sm">{saved ? 'Saved' : 'Save'}</span>
       </Button>
-      <Button variant="ghost" size="sm" onClick={handleShare}>
-        <Share2 className="h-4 w-4 mr-1" />
-        Share
+      <Button variant="ghost" size="sm" onClick={handleShare} className="h-8 sm:h-9 px-2 sm:px-3">
+        <Share2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-0.5 sm:mr-1" />
+        <span className="hidden sm:inline text-xs sm:text-sm">Share</span>
       </Button>
-      <Button variant="ghost" size="sm" onClick={handleReport} disabled={!user}>
-        <Flag className="h-4 w-4 mr-1" />
-        Report
+      <Button variant="ghost" size="sm" onClick={handleReport} disabled={!user} className="h-8 sm:h-9 px-2 sm:px-3">
+        <Flag className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-0.5 sm:mr-1" />
+        <span className="hidden sm:inline text-xs sm:text-sm">Report</span>
       </Button>
     </div>
   );

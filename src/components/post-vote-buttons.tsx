@@ -140,20 +140,21 @@ export function PostVoteButtons({
   const score = upvotes - downvotes;
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-1.5 sm:gap-2">
       <Button
         variant="outline"
         size="sm"
         onClick={() => handleVote('upvote')}
         disabled={loading}
         className={cn(
-          userVote === 'upvote' && 'bg-primary text-primary-foreground'
+          userVote === 'upvote' && 'bg-primary text-primary-foreground',
+          'h-8 sm:h-9 px-2 sm:px-3'
         )}
       >
-        <ArrowUp className="h-4 w-4 mr-1" />
-        {upvotes}
+        <ArrowUp className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-0.5 sm:mr-1" />
+        <span className="text-xs sm:text-sm">{upvotes}</span>
       </Button>
-      <div className="text-sm font-semibold min-w-[2rem] text-center">
+      <div className="text-xs sm:text-sm font-semibold min-w-[1.5rem] sm:min-w-[2rem] text-center">
         {score > 0 ? '+' : ''}{score}
       </div>
       <Button
@@ -162,11 +163,12 @@ export function PostVoteButtons({
         onClick={() => handleVote('downvote')}
         disabled={loading}
         className={cn(
-          userVote === 'downvote' && 'bg-destructive text-destructive-foreground'
+          userVote === 'downvote' && 'bg-destructive text-destructive-foreground',
+          'h-8 sm:h-9 px-2 sm:px-3'
         )}
       >
-        <ArrowDown className="h-4 w-4 mr-1" />
-        {downvotes}
+        <ArrowDown className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-0.5 sm:mr-1" />
+        <span className="text-xs sm:text-sm">{downvotes}</span>
       </Button>
     </div>
   );

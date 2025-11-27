@@ -203,21 +203,21 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
       )}
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
-        <div className="mb-8">
-          <h1 className="text-3xl font-headline font-bold mb-2">
+      <div className="container mx-auto px-4 py-6 sm:py-8 max-w-6xl">
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-headline font-bold mb-2 break-words">
             {query ? `Search Results for "${query}"` : 'Search'}
           </h1>
           {!query && (
-            <p className="text-muted-foreground">Enter a search query to find posts and topics</p>
+            <p className="text-sm sm:text-base text-muted-foreground">Enter a search query to find posts and topics</p>
           )}
         </div>
 
         {query && (
           <>
-            <Card className="mb-8">
-              <CardContent className="pt-6">
-                <form method="get" className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <Card className="mb-6 sm:mb-8">
+              <CardContent className="pt-4 sm:pt-6 px-4 sm:px-6">
+                <form method="get" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                   <input type="hidden" name="q" value={query} />
                   <div>
                     <Label className="text-sm font-medium">Post Type</Label>

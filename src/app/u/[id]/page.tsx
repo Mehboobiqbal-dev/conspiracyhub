@@ -93,22 +93,22 @@ export default async function UserProfilePage({ params }: PageProps) {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
+      <div className="container mx-auto px-4 py-6 sm:py-8 max-w-6xl">
         {/* User Card */}
-        <Card className="mb-8">
-          <CardHeader>
-            <div className="flex items-start gap-6">
-              <Avatar className="h-24 w-24">
+        <Card className="mb-6 sm:mb-8">
+          <CardHeader className="px-4 sm:px-6">
+            <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
+              <Avatar className="h-20 w-20 sm:h-24 sm:w-24 shrink-0">
                 <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="text-2xl">{user.name.charAt(0).toUpperCase()}</AvatarFallback>
+                <AvatarFallback className="text-xl sm:text-2xl">{user.name.charAt(0).toUpperCase()}</AvatarFallback>
               </Avatar>
-              <div className="flex-1">
-                <div className="flex items-start justify-between mb-2">
-                  <CardTitle className="text-3xl">{user.name}</CardTitle>
+              <div className="flex-1 min-w-0 w-full">
+                <div className="flex items-start justify-between mb-2 gap-2">
+                  <CardTitle className="text-xl sm:text-2xl md:text-3xl break-words">{user.name}</CardTitle>
                   <UserFollowButton userId={user._id} />
                 </div>
-                {user.bio && <CardDescription className="text-base mt-2">{user.bio}</CardDescription>}
-                <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mt-6">
+                {user.bio && <CardDescription className="text-sm sm:text-base mt-2 break-words">{user.bio}</CardDescription>}
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 sm:gap-4 mt-4 sm:mt-6">
                   {/* Stats */}
                   <div className="flex items-center gap-2">
                     <Trophy className="h-5 w-5 text-primary" />
@@ -160,7 +160,7 @@ export default async function UserProfilePage({ params }: PageProps) {
 
         {/* User Posts */}
         <div>
-          <h2 className="text-2xl font-semibold mb-4">Posts</h2>
+          <h2 className="text-xl sm:text-2xl font-semibold mb-4">Posts</h2>
           {posts.length === 0 ? (
             <Card>
               <CardContent className="py-12 text-center">

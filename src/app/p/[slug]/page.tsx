@@ -155,58 +155,60 @@ export default async function PostPage({ params }: PageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
-      <div className="container mx-auto">
+      <div className="container mx-auto px-4">
         {/* Breadcrumb */}
-        <nav className="mb-6 text-sm text-muted-foreground">
-          <Link href="/" className="hover:text-foreground">Home</Link>
-          {topic && (
-            <>
-              {' / '}
-              <Link href={`/t/${topic.slug}`} className="hover:text-foreground">
-                {topic.name}
-              </Link>
-            </>
-          )}
-          {' / '}
-          <span className="text-foreground">{post.title}</span>
+        <nav className="mb-4 sm:mb-6 text-xs sm:text-sm text-muted-foreground overflow-x-auto">
+          <div className="flex items-center gap-1 whitespace-nowrap">
+            <Link href="/" className="hover:text-foreground">Home</Link>
+            {topic && (
+              <>
+                <span> / </span>
+                <Link href={`/t/${topic.slug}`} className="hover:text-foreground">
+                  {topic.name}
+                </Link>
+              </>
+            )}
+            <span> / </span>
+            <span className="text-foreground truncate max-w-[200px] sm:max-w-none">{post.title}</span>
+          </div>
         </nav>
 
         <article>
-          <Card className="mb-6">
-            <CardHeader>
+          <Card className="mb-4 sm:mb-6">
+            <CardHeader className="px-4 sm:px-6">
               <div className="flex items-start justify-between gap-4 mb-4">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Badge variant={post.type === 'conspiracy' ? 'destructive' : 'default'}>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-3 flex-wrap">
+                    <Badge variant={post.type === 'conspiracy' ? 'destructive' : 'default'} className="text-xs">
                       {post.type}
                     </Badge>
                     {post.isAIGenerated && (
-                      <Badge variant="secondary">AI Generated</Badge>
+                      <Badge variant="secondary" className="text-xs">AI Generated</Badge>
                     )}
                     {topic && (
                       <Link href={`/t/${topic.slug}`}>
-                        <Badge variant="outline">{topic.name}</Badge>
+                        <Badge variant="outline" className="text-xs">{topic.name}</Badge>
                       </Link>
                     )}
                   </div>
-                  <CardTitle className="text-3xl mb-2">{post.title}</CardTitle>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                  <CardTitle className="text-xl sm:text-2xl md:text-3xl mb-2 break-words">{post.title}</CardTitle>
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+                    <div className="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm text-muted-foreground flex-wrap">
                       <div className="flex items-center gap-1">
-                        <Clock className="h-4 w-4" />
+                        <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
                         <RelativeTime date={post.createdAt} />
                       </div>
                       {author && (
                         <div className="flex items-center gap-1">
-                          <UserIcon className="h-4 w-4" />
-                          <Link href={`/u/${author._id}`} className="hover:text-foreground">
+                          <UserIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
+                          <Link href={`/u/${author._id}`} className="hover:text-foreground whitespace-nowrap">
                             {author.name}
                           </Link>
                         </div>
                       )}
                       <div className="flex items-center gap-1">
-                        <Eye className="h-4 w-4" />
-                        <span>{post.views} views</span>
+                        <Eye className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
+                        <span className="whitespace-nowrap">{post.views} views</span>
                       </div>
                     </div>
                     <PostMenu postId={post._id} postSlug={post.slug} authorId={post.authorId} />
@@ -214,16 +216,16 @@ export default async function PostPage({ params }: PageProps) {
                 </div>
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="px-4 sm:px-6">
               <PostTranslator content={post.content} originalLanguage="en" />
               <div 
                 id="post-content"
-                className="prose prose-lg dark:prose-invert max-w-none mb-6 prose-img:rounded-lg prose-img:my-4 prose-video:rounded-lg prose-video:my-4 prose-figure:my-4"
+                className="prose prose-sm sm:prose-base md:prose-lg dark:prose-invert max-w-none mb-4 sm:mb-6 prose-img:rounded-lg prose-img:my-4 prose-video:rounded-lg prose-video:my-4 prose-figure:my-4 prose-img:max-w-full"
                 dangerouslySetInnerHTML={{ __html: post.content }}
               />
 
-              <div className="flex items-center justify-between pt-4 border-t">
-                <div className="flex items-center gap-4">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 pt-4 border-t">
+                <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
                   <PostVoteButtons
                     postId={post._id}
                     postSlug={post.slug}
@@ -253,7 +255,7 @@ export default async function PostPage({ params }: PageProps) {
 
           {/* Comments Section */}
           <Card id="comments">
-            <CardContent className="pt-6">
+            <CardContent className="pt-4 sm:pt-6 px-4 sm:px-6">
               <CommentSection postId={post._id} postSlug={post.slug} />
             </CardContent>
           </Card>

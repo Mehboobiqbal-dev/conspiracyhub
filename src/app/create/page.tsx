@@ -381,16 +381,16 @@ function CreatePostPageContent() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8 max-w-3xl">
+      <div className="container mx-auto px-4 py-6 sm:py-8 max-w-3xl">
         <Card>
           <CardHeader>
-            <CardTitle>Create New Post</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-xl sm:text-2xl">Create New Post</CardTitle>
+            <CardDescription className="text-sm sm:text-base">
               Share your conspiracy theory or opinion with the community
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="type">Post Type</Label>
                 <Select value={type} onValueChange={(value: 'conspiracy' | 'opinion') => setType(value)}>
@@ -510,16 +510,16 @@ function CreatePostPageContent() {
                 </p>
               </div>
 
-              <div className="space-y-4 border rounded-lg p-4">
-                <div className="flex flex-wrap items-center justify-between gap-4">
-                  <div>
-                    <Label className="text-base">Visibility</Label>
+              <div className="space-y-4 border rounded-lg p-3 sm:p-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+                  <div className="flex-1">
+                    <Label className="text-sm sm:text-base">Visibility</Label>
                     <p className="text-xs text-muted-foreground">
                       Public posts are visible to everyone; private posts stay hidden until you share the link.
                     </p>
                   </div>
                   <Select value={visibility} onValueChange={(value: 'public' | 'private') => setVisibility(value)}>
-                    <SelectTrigger className="w-[160px]">
+                    <SelectTrigger className="w-full sm:w-[160px]">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -529,14 +529,14 @@ function CreatePostPageContent() {
                   </Select>
                 </div>
 
-                <div className="flex flex-wrap items-center justify-between gap-4 border-t pt-4">
-                  <div>
-                    <Label className="text-base">Schedule publication</Label>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 border-t pt-4">
+                  <div className="flex-1">
+                    <Label className="text-sm sm:text-base">Schedule publication</Label>
                     <p className="text-xs text-muted-foreground">
                       Queue this post to drop at a future time.
                     </p>
                   </div>
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2 sm:gap-4">
                     <Switch checked={scheduleEnabled} onCheckedChange={setScheduleEnabled} />
                     <Input
                       type="datetime-local"
@@ -544,17 +544,19 @@ function CreatePostPageContent() {
                       onChange={(e) => setScheduledAt(e.target.value)}
                       disabled={!scheduleEnabled}
                       min={new Date(Date.now() + 60 * 1000).toISOString().slice(0, 16)}
+                      className="flex-1 sm:flex-initial sm:w-auto"
                     />
                   </div>
                 </div>
               </div>
 
-              <div className="flex flex-wrap gap-4">
-                <Button onClick={handlePublish} disabled={loading}>
+              <div className="flex flex-wrap gap-2 sm:gap-4">
+                <Button onClick={handlePublish} disabled={loading} className="flex-1 sm:flex-initial">
                   {loading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Publishing...
+                      <span className="hidden sm:inline">Publishing...</span>
+                      <span className="sm:hidden">Publishing</span>
                     </>
                   ) : (
                     'Publish'
@@ -565,26 +567,29 @@ function CreatePostPageContent() {
                   variant="outline"
                   onClick={handleSaveDraft}
                   disabled={savingDraft}
+                  className="flex-1 sm:flex-initial"
                 >
                   {savingDraft ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Saving...
+                      <span className="hidden sm:inline">Saving...</span>
+                      <span className="sm:hidden">Saving</span>
                     </>
                   ) : draftId ? (
-                    'Update Draft'
+                    <span className="hidden sm:inline">Update Draft</span>
                   ) : (
-                    'Save Draft'
+                    <span className="hidden sm:inline">Save Draft</span>
                   )}
                 </Button>
                 <Button
                   type="button"
                   variant="ghost"
                   onClick={() => router.push('/drafts')}
+                  className="hidden sm:flex"
                 >
                   View Drafts
                 </Button>
-                <Button type="button" variant="outline" onClick={() => setPreviewOpen(true)}>
+                <Button type="button" variant="outline" onClick={() => setPreviewOpen(true)} className="hidden sm:flex">
                   Preview
                 </Button>
               </div>

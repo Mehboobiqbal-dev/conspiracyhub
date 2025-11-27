@@ -130,14 +130,14 @@ export function PostFeed({ initialPosts, feedType = 'public', topicSlug }: PostF
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Filters */}
-      <div className="flex gap-4 items-center flex-wrap">
+      <div className="flex gap-2 sm:gap-4 items-center flex-wrap">
         <Select value={sort} onValueChange={(value) => {
           setSort(value);
           setPage(1);
         }}>
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="w-full sm:w-[180px]">
             <SelectValue placeholder={t('sortBy')} />
           </SelectTrigger>
           <SelectContent>
@@ -154,7 +154,7 @@ export function PostFeed({ initialPosts, feedType = 'public', topicSlug }: PostF
           setType(value);
           setPage(1);
         }}>
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="w-full sm:w-[180px]">
             <SelectValue placeholder={t('filterByType')} />
           </SelectTrigger>
           <SelectContent>
@@ -165,7 +165,7 @@ export function PostFeed({ initialPosts, feedType = 'public', topicSlug }: PostF
         </Select>
 
         {pagination && (
-          <div className="text-sm text-muted-foreground ml-auto">
+          <div className="text-xs sm:text-sm text-muted-foreground ml-auto w-full sm:w-auto text-center sm:text-left">
             {tPost('showing')} {posts.length} {tPost('of')} {pagination.total} {tPost('posts')}
           </div>
         )}

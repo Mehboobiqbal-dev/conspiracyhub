@@ -11,22 +11,26 @@ export function HomeHeader() {
   const tPost = useTranslations('post');
 
   return (
-    <div className="mb-8">
-      <div className="flex items-center justify-between mb-4">
+    <div className="mb-6 sm:mb-8">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
         <div>
-          <p className="text-muted-foreground text-lg">
+          <p className="text-muted-foreground text-base sm:text-lg">
             {t('explore')}
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button asChild variant="outline">
+        <div className="flex gap-2 w-full sm:w-auto">
+          <Button asChild variant="outline" className="flex-1 sm:flex-initial">
             <Link href="/trending">
               <TrendingUp className="h-4 w-4 mr-1" />
-              {tPost('trending')}
+              <span className="hidden sm:inline">{tPost('trending')}</span>
+              <span className="sm:hidden">Trending</span>
             </Link>
           </Button>
-          <Button asChild>
-            <Link href="/create">{t('createPost')}</Link>
+          <Button asChild className="flex-1 sm:flex-initial">
+            <Link href="/create">
+              <span className="hidden sm:inline">{t('createPost')}</span>
+              <span className="sm:hidden">Create</span>
+            </Link>
           </Button>
         </div>
       </div>

@@ -83,3 +83,21 @@
     @apply bg-background text-foreground font-body;
   }
 }
+
+@layer utilities {
+  /* Responsive text utilities */
+  .text-responsive {
+    @apply text-sm sm:text-base md:text-lg;
+  }
+  
+  /* Responsive spacing */
+  .container-responsive {
+    @apply px-4 sm:px-6 lg:px-8;
+  }
+  
+  /* Prevent text overflow on mobile */
+  .break-word {
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+}

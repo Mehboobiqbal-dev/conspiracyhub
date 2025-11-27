@@ -116,24 +116,24 @@ export function PostCard({ post }: PostCardProps) {
     <Card className="hover:shadow-lg transition-shadow">
       <CardHeader>
         <div className="flex items-start justify-between gap-4">
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-2">
-              <Badge variant={post.type === 'conspiracy' ? 'destructive' : 'default'}>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-2 flex-wrap">
+              <Badge variant={post.type === 'conspiracy' ? 'destructive' : 'default'} className="text-xs">
                 {post.type}
               </Badge>
               {post.isAIGenerated && (
-                <Badge variant="secondary">{t('aiGenerated')}</Badge>
+                <Badge variant="secondary" className="text-xs">{t('aiGenerated')}</Badge>
               )}
               {post.topicSlug && (
                 <Link href={`/t/${post.topicSlug}`}>
-                  <Badge variant="outline" className="hover:bg-accent cursor-pointer">
+                  <Badge variant="outline" className="hover:bg-accent cursor-pointer text-xs">
                     {post.topicSlug}
                   </Badge>
                 </Link>
               )}
             </div>
             <Link href={`/p/${post.slug}`}>
-              <CardTitle className="text-2xl hover:text-primary transition-colors cursor-pointer">
+              <CardTitle className="text-lg sm:text-xl md:text-2xl hover:text-primary transition-colors cursor-pointer break-words">
                 {post.title}
               </CardTitle>
             </Link>
@@ -186,7 +186,7 @@ export function PostCard({ post }: PostCardProps) {
         </div>
       </CardHeader>
       <CardContent>
-        <div className="flex items-center gap-6 text-sm text-muted-foreground">
+        <div className="flex items-center gap-3 sm:gap-6 text-sm text-muted-foreground flex-wrap">
           <PostVoteButtons
             postId={post._id}
             postSlug={post.slug}
@@ -201,15 +201,15 @@ export function PostCard({ post }: PostCardProps) {
             onClick={() => setShowComments((prev) => !prev)}
           />
           <div className="flex items-center gap-1">
-            <Eye className="h-4 w-4" />
-            <span>{post.views}</span>
+            <Eye className="h-4 w-4 shrink-0" />
+            <span className="whitespace-nowrap">{post.views}</span>
           </div>
           <div className="flex items-center gap-1">
-            <Clock className="h-4 w-4" />
-            <span>{formatDistanceToNow(post.createdAt instanceof Date ? post.createdAt : new Date(post.createdAt), { addSuffix: true })}</span>
+            <Clock className="h-4 w-4 shrink-0" />
+            <span className="whitespace-nowrap">{formatDistanceToNow(post.createdAt instanceof Date ? post.createdAt : new Date(post.createdAt), { addSuffix: true })}</span>
           </div>
           {post.authorName && (
-            <span>{t('by')} {post.authorName}</span>
+            <span className="hidden sm:inline whitespace-nowrap">{t('by')} {post.authorName}</span>
           )}
         </div>
         {post.tags && post.tags.length > 0 && (

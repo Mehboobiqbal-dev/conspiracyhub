@@ -64,18 +64,18 @@ export function MainNav() {
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto px-4">
-        <div className="flex h-16 items-center justify-between gap-4">
+      <div className="container mx-auto px-2 sm:px-4">
+        <div className="flex h-14 sm:h-16 items-center justify-between gap-2 sm:gap-4">
           {/* Logo and Navigation */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
             <Sheet open={mobileNavOpen} onOpenChange={setMobileNavOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="lg:hidden">
+                <Button variant="ghost" size="icon" className="lg:hidden shrink-0">
                   <Menu className="h-5 w-5" />
                   <span className="sr-only">Navigation menu</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left">
+              <SheetContent side="left" className="w-[280px] sm:w-[320px]">
                 <SheetHeader>
                   <SheetTitle>{t('navigateTitle')}</SheetTitle>
                   <SheetDescription>{t('navigateDescription')}</SheetDescription>
@@ -116,10 +116,10 @@ export function MainNav() {
                 </div>
               </SheetContent>
             </Sheet>
-            <Link href="/" className="flex items-center gap-2">
-              <span className="font-headline text-xl font-bold flex items-center gap-2">
-                <img src="/favicon-16x16.png" alt="Elch Logo" width={24} height={24} className="inline-block" />
-                Elch
+            <Link href="/" className="flex items-center gap-1 sm:gap-2 shrink-0">
+              <span className="font-headline text-lg sm:text-xl font-bold flex items-center gap-1 sm:gap-2">
+                <img src="/favicon-16x16.png" alt="Elch Logo" width={20} height={20} className="sm:w-6 sm:h-6 inline-block" />
+                <span className="hidden sm:inline">Elch</span>
               </span>
             </Link>
             <div className="hidden lg:flex items-center gap-4">
@@ -146,8 +146,8 @@ export function MainNav() {
           </div>
 
           {/* Search */}
-          <form onSubmit={handleSearch} className="flex-1 max-w-md mx-4">
-            <div className="relative">
+          <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-md mx-2 sm:mx-4">
+            <div className="relative w-full">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 type="search"
@@ -159,14 +159,39 @@ export function MainNav() {
             </div>
           </form>
 
+          {/* Mobile Search Button */}
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="md:hidden shrink-0">
+                <Search className="h-5 w-5" />
+                <span className="sr-only">Search</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="top" className="pt-12">
+              <form onSubmit={handleSearch} className="w-full">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    type="search"
+                    placeholder={t('searchPlaceholder')}
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10"
+                    autoFocus
+                  />
+                </div>
+              </form>
+            </SheetContent>
+          </Sheet>
+
           {/* Right Side Actions */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
             {user ? (
               <>
                 <Button asChild size="sm" className="hidden sm:flex">
                   <Link href="/create">
                     <Plus className="h-4 w-4 mr-1" />
-                    {t('create')}
+                    <span className="hidden lg:inline">{t('create')}</span>
                   </Link>
                 </Button>
                 <DraftsTray />
@@ -175,10 +200,10 @@ export function MainNav() {
                 <LanguageSelector />
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                      <Avatar className="h-10 w-10">
+                    <Button variant="ghost" className="relative h-8 w-8 sm:h-10 sm:w-10 rounded-full shrink-0">
+                      <Avatar className="h-8 w-8 sm:h-10 sm:w-10">
                         <AvatarImage src={user.avatar} alt={user.name} />
-                        <AvatarFallback>{user.name.charAt(0).toUpperCase()}</AvatarFallback>
+                        <AvatarFallback className="text-xs sm:text-sm">{user.name.charAt(0).toUpperCase()}</AvatarFallback>
                       </Avatar>
                     </Button>
                   </DropdownMenuTrigger>
@@ -225,10 +250,10 @@ export function MainNav() {
             ) : (
               <>
                 <LanguageSelector />
-                <Button asChild variant="ghost" size="sm">
+                <Button asChild variant="ghost" size="sm" className="hidden sm:flex">
                   <Link href="/login">{t('login')}</Link>
                 </Button>
-                <Button asChild size="sm">
+                <Button asChild size="sm" className="hidden sm:flex">
                   <Link href="/login">{t('signup')}</Link>
                 </Button>
               </>

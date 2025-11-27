@@ -45,7 +45,7 @@ export default async function HomePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
+      <div className="container mx-auto px-4 py-6 sm:py-8 max-w-6xl">
         <HomeHeader />
         <PostFeed feedType="public" />
       </div>

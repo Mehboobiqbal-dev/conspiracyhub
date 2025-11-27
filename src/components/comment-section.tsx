@@ -352,8 +352,8 @@ export function CommentSection({ postId, postSlug }: CommentSectionProps) {
       )}
 
       {comments.length > 0 && (
-        <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-lg font-semibold">{comments.length} Comments</h3>
+        <div className="mb-4 flex items-center justify-between gap-4 flex-wrap">
+          <h3 className="text-base sm:text-lg font-semibold">{comments.length} Comments</h3>
           <CommentSort value={sort} onValueChange={setSort} />
         </div>
       )}
@@ -461,32 +461,34 @@ function CommentItem({
 
   return (
     <Card>
-      <CardContent className="pt-6">
-        <div className="flex gap-4">
-          <div className="flex flex-col items-center gap-1">
+      <CardContent className="pt-4 sm:pt-6">
+        <div className="flex gap-2 sm:gap-4">
+          <div className="flex flex-col items-center gap-1 shrink-0">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => onVote(comment._id, 'upvote')}
               disabled={!user}
+              className="h-8 w-8 p-0"
             >
-              <ArrowUp className="h-4 w-4" />
+              <ArrowUp className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </Button>
-            <span className="text-sm font-medium">{comment.upvotes - comment.downvotes}</span>
+            <span className="text-xs sm:text-sm font-medium">{comment.upvotes - comment.downvotes}</span>
             <Button
               variant="ghost"
               size="sm"
               onClick={() => onVote(comment._id, 'downvote')}
               disabled={!user}
+              className="h-8 w-8 p-0"
             >
-              <ArrowDown className="h-4 w-4" />
+              <ArrowDown className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </Button>
           </div>
-          <div className="flex-1">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2">
-                <span className="font-semibold">{comment.authorName || 'Anonymous'}</span>
-                <span className="text-sm text-muted-foreground">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-start sm:items-center justify-between mb-2 gap-2 flex-wrap">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="font-semibold text-sm sm:text-base">{comment.authorName || 'Anonymous'}</span>
+                <span className="text-xs sm:text-sm text-muted-foreground whitespace-nowrap">
                   {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
                 </span>
                 {comment.isEdited && (
@@ -530,16 +532,16 @@ function CommentItem({
               </>
             )}
             {comment.replies && comment.replies.length > 0 && (
-              <div className="mt-4 ml-4 space-y-2 border-l-2 pl-4">
+              <div className="mt-4 ml-2 sm:ml-4 space-y-2 border-l-2 pl-2 sm:pl-4">
                 {comment.replies.map((reply) => (
-                  <div key={reply._id} className="text-sm">
-                    <div className="flex items-center gap-2 mb-1">
+                  <div key={reply._id} className="text-xs sm:text-sm">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
                       <span className="font-semibold">{reply.authorName || 'Anonymous'}</span>
-                      <span className="text-xs text-muted-foreground">
+                      <span className="text-xs text-muted-foreground whitespace-nowrap">
                         {formatDistanceToNow(new Date(reply.createdAt), { addSuffix: true })}
                       </span>
                     </div>
-                    <p className="whitespace-pre-wrap mb-1">{reply.content}</p>
+                    <p className="whitespace-pre-wrap mb-1 break-words">{reply.content}</p>
                     {reply.attachment && (
                       <CommentAttachmentBlock attachment={reply.attachment} />
                     )}

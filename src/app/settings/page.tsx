@@ -167,17 +167,17 @@ export default function SettingsPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
-        <h1 className="text-4xl font-headline font-bold mb-8">Settings</h1>
+      <div className="container mx-auto px-4 py-6 sm:py-8 max-w-4xl">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-headline font-bold mb-6 sm:mb-8">Settings</h1>
 
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           <Card>
-            <CardHeader>
-              <CardTitle>Profile Photo</CardTitle>
-              <CardDescription>Use signed uploads for fast, secure avatar updates.</CardDescription>
+            <CardHeader className="px-4 sm:px-6">
+              <CardTitle className="text-lg sm:text-xl">Profile Photo</CardTitle>
+              <CardDescription className="text-sm">Use signed uploads for fast, secure avatar updates.</CardDescription>
             </CardHeader>
-            <CardContent className="flex flex-col md:flex-row items-center gap-6">
-              <Avatar className="h-24 w-24">
+            <CardContent className="flex flex-col md:flex-row items-center gap-4 sm:gap-6 px-4 sm:px-6">
+              <Avatar className="h-20 w-20 sm:h-24 sm:w-24 shrink-0">
                 {avatar ? (
                   <AvatarImage src={avatar} alt={user.name} />
                 ) : (
@@ -231,11 +231,11 @@ export default function SettingsPage() {
           </Card>
 
           <Card>
-            <CardHeader>
-              <CardTitle>Profile Settings</CardTitle>
-              <CardDescription>Update your public details</CardDescription>
+            <CardHeader className="px-4 sm:px-6">
+              <CardTitle className="text-lg sm:text-xl">Profile Settings</CardTitle>
+              <CardDescription className="text-sm">Update your public details</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="px-4 sm:px-6">
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="name">Display name</Label>
