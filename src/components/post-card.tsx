@@ -139,16 +139,16 @@ export function PostCard({ post }: PostCardProps) {
             </Link>
             {(post.excerpt || post.content) && (
               <div className="mt-2">
-                <CardDescription className="line-clamp-2">
-                  {showFullContent ? (
-                    <div 
-                      dangerouslySetInnerHTML={{ __html: displayContent }}
-                      className="prose prose-sm max-w-none dark:prose-invert"
-                    />
-                  ) : (
-                    previewText
-                  )}
-                </CardDescription>
+                {showFullContent ? (
+                  <div 
+                    dangerouslySetInnerHTML={{ __html: displayContent }}
+                    className="prose prose-sm max-w-none dark:prose-invert prose-img:rounded-lg prose-img:my-4 prose-video:rounded-lg prose-video:my-4 prose-figure:my-4 prose-img:max-w-full prose-video:max-w-full prose-video:w-full prose-video:h-auto"
+                  />
+                ) : (
+                  <CardDescription className="line-clamp-2">
+                    {previewText}
+                  </CardDescription>
+                )}
                 <div className="flex gap-2 mt-2">
                   <Button
                     variant="ghost"

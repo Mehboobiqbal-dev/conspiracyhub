@@ -6,7 +6,7 @@ import { z } from 'zod';
 
 const editPostSchema = z.object({
   title: z.string().min(5).max(200).optional(),
-  content: z.string().min(100).max(10000).optional(),
+  content: z.string().min(100).optional(),
   tags: z.array(z.string()).optional(),
 });
 

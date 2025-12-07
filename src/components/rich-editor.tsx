@@ -409,8 +409,8 @@ export function RichEditor({
               .chain()
               .focus()
               .insertContent(
-                `<figure class="my-4"><video controls class="w-full rounded-xl"><source src="${result.url}" type="${result.mimeType}" /></video>${
-                  caption ? `<figcaption class="text-center text-sm text-muted-foreground">${caption}</figcaption>` : ''
+                `<figure class="my-4"><video controls playsinline preload="metadata" class="w-full rounded-xl max-w-full h-auto"><source src="${result.url}" type="${result.mimeType || 'video/mp4'}" /></video>${
+                  caption ? `<figcaption class="text-center text-sm text-muted-foreground mt-2">${caption}</figcaption>` : ''
                 }</figure>`
               )
               .run();
@@ -455,9 +455,9 @@ export function RichEditor({
           .chain()
           .focus()
           .insertContent(
-            `<figure class="my-4"><video controls class="w-full rounded-xl"><source src="${asset.url}" /></video>${
+            `<figure class="my-4"><video controls playsinline preload="metadata" class="w-full rounded-xl max-w-full h-auto"><source src="${asset.url}" type="video/mp4" /></video>${
               asset.caption
-                ? `<figcaption class="text-center text-sm text-muted-foreground">${asset.caption}</figcaption>`
+                ? `<figcaption class="text-center text-sm text-muted-foreground mt-2">${asset.caption}</figcaption>`
                 : ''
             }</figure>`
           )

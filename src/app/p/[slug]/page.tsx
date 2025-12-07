@@ -220,7 +220,7 @@ export default async function PostPage({ params }: PageProps) {
               <PostTranslator content={post.content} originalLanguage="en" />
               <div 
                 id="post-content"
-                className="prose prose-sm sm:prose-base md:prose-lg dark:prose-invert max-w-none mb-4 sm:mb-6 prose-img:rounded-lg prose-img:my-4 prose-video:rounded-lg prose-video:my-4 prose-figure:my-4 prose-img:max-w-full"
+                className="prose prose-sm sm:prose-base md:prose-lg dark:prose-invert max-w-none mb-4 sm:mb-6 prose-img:rounded-lg prose-img:my-4 prose-video:rounded-lg prose-video:my-4 prose-figure:my-4 prose-img:max-w-full prose-video:max-w-full prose-video:w-full prose-video:h-auto"
                 dangerouslySetInnerHTML={{ __html: post.content }}
               />
 

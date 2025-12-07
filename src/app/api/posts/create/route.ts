@@ -30,7 +30,7 @@ const mediaSchema = z.object({
 
 const createPostSchema = z.object({
   title: z.string().min(5).max(200),
-  content: z.string().min(100).max(10000),
+  content: z.string().min(100),
   type: z.enum(['conspiracy', 'opinion']),
   topicSlug: z.string().optional(),
   tags: z.array(z.string()).optional(),
